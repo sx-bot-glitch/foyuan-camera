@@ -304,23 +304,21 @@ let dateY;
 
 if(isLandscape){
 
-    infoX = canvas.width * 0.84;
+    infoX = canvas.width / 2;
 
-    scoreY = 180;
-    titleY = 230;
-    textY = 290;
-    templeY = 350;
-    dateY = 400;
+    scoreY = canvas.height - 140;
+    textY = canvas.height - 100;
+    templeY = canvas.height - 60;
+    dateY = canvas.height - 25;
 
 }else{
 
     infoX = canvas.width / 2;
 
-    scoreY = canvas.height - 260;
-    titleY = canvas.height - 210;
-    textY = canvas.height - 160;
-    templeY = canvas.height - 110;
-    dateY = canvas.height - 60;
+    scoreY = canvas.height - 180;
+    textY = canvas.height - 130;
+    templeY = canvas.height - 80;
+    dateY = canvas.height - 35;
 
 }
         ctx.textAlign="center";
@@ -361,7 +359,7 @@ ctx.fillText(
     textY
 );
 
-        ctx.font="28px 標楷體";
+        ctx.font="28px sans-serif";
 
         ctx.strokeText(
     "感恩精舍祝您新春愉快",
