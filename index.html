@@ -168,6 +168,44 @@ function capturePhoto(){
             canvas.width,
             canvas.height
         );
+        const sparkle = new Image();
+
+sparkle.onload = function(){
+
+    ctx.globalAlpha = 0.45;
+
+    ctx.drawImage(
+        sparkle,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.globalAlpha = 1;
+};
+
+sparkle.src = "sparkles.png";
+alert("星點完成");
+        const sparkle = new Image();
+
+sparkle.onload = function(){
+
+    ctx.globalAlpha = 0.55;
+
+    ctx.drawImage(
+        sparkle,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.globalAlpha = 1;
+
+};
+
+sparkle.src = "sparkle.png";
         for(let i=0;i<120;i++){
 
     const x =
