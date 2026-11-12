@@ -1,1 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
 
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>佛緣指數打卡機</title>
+
+<style>
+
+body{
+    margin:0;
+    background:#f5f0d8;
+    font-family:"Microsoft JhengHei",sans-serif;
+    text-align:center;
+}
+
+.container{
+    padding-top:80px;
+}
+
+h1{
+    color:#8a6d00;
+    font-size:42px;
+    margin-bottom:40px;
+}
+
+button{
+    background:#ffd700;
+    color:#333;
+    font-size:28px;
+    border:none;
+    border-radius:15px;
+    padding:20px 50px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#ffcc00;
+}
+
+.result{
+    margin-top:40px;
+    font-size:36px;
+    color:#8a6d00;
+}
+
+.message{
+    margin-top:20px;
+    font-size:24px;
+    color:#444;
+}
+
+footer{
+    margin-top:80px;
+    color:#888;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🙏 佛緣指數打卡機 🙏</h1>
+
+    <button onclick="testFate()">
+        開始測試
+    </button>
+
+    <div id="score" class="result"></div>
+    <div id="msg" class="message"></div>
+
+</div>
+
+<footer>
+    願一切眾生平安吉祥
+</footer>
+
+<script>
+
+function testFate(){
+
+    const score =
+        Math.floor(Math.random() * 21) + 80;
+
+    let msg = "";
+
+    if(score >= 98){
+        msg = "福慧具足，佛光普照";
+    }
+    else if(score >= 95){
+        msg = "吉祥圓滿，善緣深厚";
+    }
+    else if(score >= 90){
+        msg = "善根具足，福報增長";
+    }
+    else{
+        msg = "善念常存，福氣漸增";
+    }
+
+    document.getElementById("score").innerHTML =
+        "您的佛緣指數：" + score + " 分";
+
+    document.getElementById("msg").innerHTML =
+        msg;
+}
+
+</script>
+
+</body>
+</html>
