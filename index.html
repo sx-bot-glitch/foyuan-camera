@@ -62,7 +62,7 @@ button:hover{
 
 <body>
 
-<h1>🙏 佛緣祈福打卡機 🙏</h1>
+<h1>🙏 佛緣祈福 🙏</h1>
 <h3>台南玉井感恩精舍</h3>
 
 <video
@@ -188,7 +188,7 @@ function capturePhoto(){
 
         glow.addColorStop(
             1,
-            "rgba(255,215,0,0)"
+            "rgba(255,215,0,0.18)"
         );
 
         ctx.fillStyle=glow;
@@ -216,57 +216,105 @@ function capturePhoto(){
                 Math.random()*cards.length
             )
         ];
+const isLandscape =
+canvas.width > canvas.height;
 
-        // 底部資訊區
+let infoX;
+let scoreY;
+let titleY;
+let textY;
+let templeY;
+let dateY;
 
-        ctx.fillStyle =
-        "rgba(0,0,0,0.65)";
+if(isLandscape){
 
-        ctx.fillRect(
-            0,
-            canvas.height-240,
-            canvas.width,
-            240
-        );
+    infoX = canvas.width * 0.84;
 
+    scoreY = 180;
+    titleY = 230;
+    textY = 290;
+    templeY = 350;
+    dateY = 400;
+
+}else{
+
+    infoX = canvas.width / 2;
+
+    scoreY = canvas.height - 260;
+    titleY = canvas.height - 210;
+    textY = canvas.height - 160;
+    templeY = canvas.height - 110;
+    dateY = canvas.height - 60;
+
+}
         ctx.textAlign="center";
+        ctx.shadowColor =
+"rgba(255,215,0,0.8)";
+
+ctx.shadowBlur = 20;
+
+ctx.strokeStyle="#c89b00";
 
         ctx.fillStyle="gold";
         ctx.font="bold 48px sans-serif";
 
-        ctx.fillText(
-            "🙏 佛緣指數 " + result[0],
-            canvas.width/2,
-            canvas.height-155
-        );
+        ctx.strokeText(
+    "🙏 佛緣指數 " + result[0],
+    infoX,
+    scoreY
+);
+
+ctx.fillText(
+    "🙏 佛緣指數 " + result[0],
+    infoX,
+    scoreY
+);
 
         ctx.fillStyle="white";
         ctx.font="bold 34px sans-serif";
 
-        ctx.fillText(
-            result[1],
-            canvas.width/2,
-            canvas.height-105
-        );
+        ctx.strokeText(
+    result[1],
+    infoX,
+    textY
+);
+
+ctx.fillText(
+    result[1],
+    infoX,
+    textY
+);
 
         ctx.font="28px sans-serif";
 
-        ctx.fillText(
-            "玉井感恩精舍",
-            canvas.width/2,
-            canvas.height-60
-        );
+        ctx.strokeText(
+    "玉井感恩精舍",
+    infoX,
+    templeY
+);
+
+ctx.fillText(
+    "玉井感恩精舍",
+    infoX,
+    templeY
+);
 
         const today =
         new Date().toLocaleDateString();
 
         ctx.font="22px sans-serif";
 
-        ctx.fillText(
-            today,
-            canvas.width/2,
-            canvas.height-25
-        );
+        ctx.strokeText(
+    today,
+    infoX,
+    dateY
+);
+
+ctx.fillText(
+    today,
+    infoX,
+    dateY
+);
 
         // ===== Logo =====
 
@@ -274,13 +322,22 @@ function capturePhoto(){
 
         logo.onload = function(){
 
-            ctx.drawImage(
-                logo,
-                canvas.width-140,
-                20,
-                120,
-                120
-            );
+            ctx.save();
+
+ctx.globalAlpha = 0.75;
+
+ctx.filter =
+"sepia(100%) saturate(800%) hue-rotate(-50deg)";
+
+ctx.drawImage(
+    logo,
+    20,
+    canvas.height-95,
+    70,
+    70
+);
+
+ctx.restore();
 
             finishImage();
 
@@ -300,7 +357,7 @@ function capturePhoto(){
 
             ctx.strokeStyle="gold";
 
-            ctx.lineWidth=10;
+            ctx.lineWidth=14;
 
             ctx.strokeRect(
                 0,
@@ -333,7 +390,7 @@ function capturePhoto(){
             "inline-block";
         }
 
-    },3000);
+    },3500);
 
 }
 
