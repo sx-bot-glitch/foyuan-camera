@@ -201,5 +201,80 @@ function capturePhoto(){
 
         const logo =
         new Image();
+logo.onload = function(){
 
+    ctx.save();
+
+    ctx.globalAlpha = 0.75;
+
+    ctx.filter =
+    "sepia(100%) saturate(800%) hue-rotate(-40deg)";
+
+    ctx.drawImage(
+        logo,
+        canvas.width - 90,
+        15,
+        70,
+        70
+    );
+
+    ctx.restore();
+
+    finishImage();
+
+};
+
+logo.onerror = function(){
+
+    finishImage();
+
+};
+
+logo.src = "logo.png";
+
+function finishImage(){
+
+    ctx.strokeStyle = "gold";
+    ctx.lineWidth = 8;
+
+    ctx.strokeRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const link =
+    document.getElementById(
+        "downloadLink"
+    );
+
+    link.href =
+    canvas.toDataURL(
+        "image/png"
+    );
+
+    link.download =
+    "感恩精舍祈福照.png";
+
+    link.style.display =
+    "inline-block";
+
+    const shareBtn =
+    document.getElementById(
+        "shareBtn"
+    );
+
+    if(shareBtn){
+
+        shareBtn.style.display =
+        "inline-block";
+
+    }
+
+}
+
+},3500);
+
+}
      
