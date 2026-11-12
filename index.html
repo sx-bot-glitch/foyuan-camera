@@ -1,141 +1,3 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>玉井感恩精舍 佛緣祈福打卡機</title>
-
-<style>
-
-body{
-    margin:0;
-    padding:20px;
-    text-align:center;
-    background:#f7f2dd;
-    font-family:"Microsoft JhengHei",sans-serif;
-}
-
-h1{
-    color:#9c7300;
-    margin-bottom:10px;
-}
-
-h3{
-    color:#666;
-    font-weight:normal;
-}
-
-video,
-canvas{
-    width:95%;
-    max-width:600px;
-    border:4px solid #d4af37;
-    border-radius:15px;
-}
-
-button{
-    margin:10px;
-    padding:15px 35px;
-    font-size:22px;
-    border:none;
-    border-radius:12px;
-    background:#ffd700;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#f5c400;
-}
-
-#loading{
-    display:none;
-    font-size:24px;
-    color:#9c7300;
-    font-weight:bold;
-    margin:20px;
-}
-
-</style>
-</head>
-
-<body>
-
-<h1>🙏 佛緣祈福打卡機 🙏</h1>
-<h3>台南玉井感恩精舍</h3>
-
-<video
-id="video"
-autoplay
-playsinline
-muted>
-</video>
-
-<br>
-
-<button id="photoBtn">
-開始祈福拍攝
-</button>
-
-<div id="loading">
-🙏 正在感應佛緣中...
-</div>
-
-<br>
-
-<canvas id="canvas"></canvas>
-
-<br>
-
-<a id="downloadLink" style="display:none;">
-    <button>
-        下載祈福照
-    </button>
-</a>
-
-<button
-id="shareBtn"
-style="display:none;">
-分享祈福照
-</button>
-
-<script>
-
-const video =
-document.getElementById("video");
-
-const canvas =
-document.getElementById("canvas");
-
-const ctx =
-canvas.getContext("2d");
-
-navigator.mediaDevices
-.getUserMedia({
-    video:true
-})
-.then(function(stream){
-
-    video.srcObject = stream;
-
-})
-.catch(function(error){
-
-    alert(
-      "相機啟動失敗："+
-      error.message
-    );
-
-});
-
-document
-.getElementById("photoBtn")
-.addEventListener(
-"click",
-capturePhoto
-);
-
 function capturePhoto(){
 
     if(video.videoWidth===0){
@@ -145,21 +7,29 @@ function capturePhoto(){
         return;
     }
 
-    document
-    .getElementById("loading")
-    .style.display="block";
+    const loading =
+    document.getElementById("loading");
+
+    loading.style.display="block";
 
     setTimeout(function(){
 
-        document
-        .getElementById("loading")
-        .style.display="none";
+        loading.style.display="none";
 
         canvas.width =
         video.videoWidth;
 
         canvas.height =
         video.videoHeight;
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        // 原始照片
 
         ctx.drawImage(
             video,
@@ -169,225 +39,167 @@ function capturePhoto(){
             canvas.height
         );
 
-        // ===== 佛光特效 =====
+        // ===================
+        // 放射狀佛光
+        // ===================
 
-        const glow =
-        ctx.createRadialGradient(
-            canvas.width/2,
-            canvas.height/2,
-            50,
-            canvas.width/2,
-            canvas.height/2,
-            canvas.width/1.5
-        );
+        const centerX =
+        canvas.width/2;
 
-        glow.addColorStop(
-            0,
-            "rgba(255,215,0,0.45)"
-        );
+        const centerY =
+        canvas.height*0.45;
 
-        glow.addColorStop(
-            1,
-            "rgba(255,215,0,0)"
-        );
+        for(let i=0;i<36;i++){
 
-        ctx.fillStyle=glow;
+            let angle =
+            (i*10) *
+            Math.PI/180;
 
-        ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
+            ctx.beginPath();
+
+            ctx.moveTo(
+                centerX,
+                centerY
+            );
+
+            ctx.lineTo(
+                centerX +
+                Math.cos(angle)*1500,
+
+                centerY +
+                Math.sin(angle)*1500
+            );
+
+            ctx.strokeStyle =
+            "rgba(255,215,0,0.12)";
+
+            ctx.lineWidth=6;
+
+            ctx.stroke();
+        }
+
+        // ===================
+        // 抽佛緣
+        // ===================
 
         const cards=[
 
-            ["88","善念常存"],
-            ["92","福德增長"],
-            ["95","廣結善緣"],
-            ["98","吉祥圓滿"],
-            ["100","佛光普照"]
+          ["88","善念常存"],
+          ["92","福德增長"],
+          ["95","廣結善緣"],
+          ["98","吉祥圓滿"],
+          ["100","佛光普照"]
 
         ];
 
         const result =
         cards[
-            Math.floor(
-                Math.random()*cards.length
-            )
+          Math.floor(
+            Math.random()*cards.length
+          )
         ];
 
-        // 底部資訊區
+        // ===================
+        // 右側資訊
+        // ===================
 
-        ctx.fillStyle =
-        "rgba(0,0,0,0.65)";
-
-        ctx.fillRect(
-            0,
-            canvas.height-240,
-            canvas.width,
-            240
-        );
+        const infoX =
+        canvas.width*0.82;
 
         ctx.textAlign="center";
 
-        ctx.fillStyle="gold";
-        ctx.font="bold 48px sans-serif";
+        // 描邊
 
-        ctx.fillText(
-            "🙏 佛緣指數 " + result[0],
-            canvas.width/2,
-            canvas.height-155
+        ctx.lineWidth=8;
+        ctx.strokeStyle="#b8860b";
+
+        ctx.font=
+        "bold 52px sans-serif";
+
+        ctx.strokeText(
+          result[0],
+          infoX,
+          180
         );
 
         ctx.fillStyle="white";
-        ctx.font="bold 34px sans-serif";
 
         ctx.fillText(
-            result[1],
-            canvas.width/2,
-            canvas.height-105
+          result[0],
+          infoX,
+          180
         );
 
-        ctx.font="28px sans-serif";
+        ctx.font=
+        "bold 28px sans-serif";
+
+        ctx.strokeText(
+          "佛緣指數",
+          infoX,
+          230
+        );
 
         ctx.fillText(
-            "玉井感恩精舍",
-            canvas.width/2,
-            canvas.height-60
+          "佛緣指數",
+          infoX,
+          230
         );
+
+        ctx.font=
+        "bold 26px sans-serif";
+
+        ctx.strokeText(
+          result[1],
+          infoX,
+          290
+        );
+
+        ctx.fillText(
+          result[1],
+          infoX,
+          290
+        );
+
+        // ===================
+        // 日期
+        // ===================
 
         const today =
-        new Date().toLocaleDateString();
+        new Date()
+        .toLocaleDateString();
 
-        ctx.font="22px sans-serif";
+        ctx.font=
+        "22px sans-serif";
+
+        ctx.strokeText(
+          "玉井感恩精舍",
+          infoX,
+          350
+        );
 
         ctx.fillText(
-            today,
-            canvas.width/2,
-            canvas.height-25
+          "玉井感恩精舍",
+          infoX,
+          350
         );
 
-        // ===== Logo =====
-
-        const logo = new Image();
-
-        logo.onload = function(){
-
-            ctx.drawImage(
-                logo,
-                canvas.width-140,
-                20,
-                120,
-                120
-            );
-
-            finishImage();
-
-        };
-
-        logo.onerror = function(){
-
-            finishImage();
-
-        };
-
-        logo.src="logo.png";
-
-        function finishImage(){
-
-            // 金色外框
-
-            ctx.strokeStyle="gold";
-
-            ctx.lineWidth=10;
-
-            ctx.strokeRect(
-                0,
-                0,
-                canvas.width,
-                canvas.height
-            );
-
-            const link =
-            document.getElementById(
-                "downloadLink"
-            );
-
-            link.href =
-            canvas.toDataURL(
-                "image/png"
-            );
-
-            link.download =
-            "感恩精舍祈福照.png";
-
-            link.style.display =
-            "inline-block";
-
-            document
-            .getElementById(
-                "shareBtn"
-            )
-            .style.display=
-            "inline-block";
-        }
-
-    },3000);
-
-}
-
-document
-.getElementById("shareBtn")
-.addEventListener(
-"click",
-sharePhoto
-);
-
-async function sharePhoto(){
-
-    try{
-
-        const response =
-        await fetch(
-            canvas.toDataURL("image/png")
+        ctx.strokeText(
+          today,
+          infoX,
+          390
         );
 
-        const blob =
-        await response.blob();
-
-        const file =
-        new File(
-            [blob],
-            "感恩精舍祈福照.png",
-            {
-                type:"image/png"
-            }
+        ctx.fillText(
+          today,
+          infoX,
+          390
         );
 
-        if(navigator.share){
+        // ===================
+        // Logo印章
+        // ===================
 
-            await navigator.share({
-                title:"感恩精舍祈福照",
-                text:"我在玉井感恩精舍完成佛緣打卡",
-                files:[file]
-            });
+        const logo =
+        new Image();
 
-        }else{
-
-            alert("此裝置不支援分享功能");
-
-        }
-
-    }catch(e){
-
-        console.log(e);
-
-    }
-
-}
-
-</script>
-
-</body>
-</html>
+     
