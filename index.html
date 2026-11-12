@@ -171,41 +171,28 @@ function capturePhoto(){
 
         // ===== 柔光佛光 =====
 
-const glow =
-ctx.createRadialGradient(
-    canvas.width/2,
-    canvas.height*0.6,
-    50,
-    canvas.width/2,
-    canvas.height*0.6,
-    canvas.width
-);
 
-glow.addColorStop(
-    0,
-    "rgba(255,245,200,0.35)"
-);
+       const sparkle = new Image();
 
-glow.addColorStop(
-    0.5,
-    "rgba(255,215,0,0.12)"
-);
+sparkle.onload = function(){
 
-glow.addColorStop(
-    1,
-    "rgba(255,215,0,0)"
-);
+    ctx.globalAlpha = 0.45;
 
-ctx.fillStyle = glow;
+    ctx.drawImage(
+        sparkle,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
 
-ctx.fillRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-);
-        for(let i=0;i<150;i++){
+    ctx.globalAlpha = 1;
 
+    drawTextAndLogo();
+
+};
+
+sparkle.src = "sparkles.png";
     const x =
     Math.random()*canvas.width;
 
@@ -247,37 +234,20 @@ ctx.fillRect(
                 Math.random()*cards.length
             )
         ];
-const isLandscape =
-canvas.width > canvas.height;
+const infoX =
+canvas.width / 2;
 
-let infoX;
-let scoreY;
-let titleY;
-let textY;
-let templeY;
-let dateY;
+const scoreY =
+canvas.height - 140;
 
-if(isLandscape){
+const textY =
+canvas.height - 100;
 
-    infoX = canvas.width * 0.84;
+const templeY =
+canvas.height - 60;
 
-    scoreY = 180;
-    titleY = 230;
-    textY = 290;
-    templeY = 350;
-    dateY = 400;
-
-}else{
-
-    infoX = canvas.width / 2;
-
-    scoreY = canvas.height - 260;
-    titleY = canvas.height - 210;
-    textY = canvas.height - 160;
-    templeY = canvas.height - 110;
-    dateY = canvas.height - 60;
-
-}
+const dateY =
+canvas.height - 25;
         ctx.textAlign="center";
         ctx.shadowColor =
 "rgba(255,215,0,0.8)";
@@ -285,10 +255,17 @@ if(isLandscape){
 ctx.shadowBlur = 20;
 
 ctx.strokeStyle="#c89b00";
+    ctx.lineWidth = 8;
 
-        ctx.fillStyle="gold";
+        ctx.fillStyle="white";
         ctx.font="bold 48px sans-serif";
+ctx.fillStyle="red";
 
+ctx.fillText(
+    "TEST",
+    canvas.width/2,
+    100
+);
         ctx.strokeText(
     "🙏 佛緣指數 " + result[0],
     infoX,
@@ -316,7 +293,8 @@ ctx.fillText(
     textY
 );
 
-        ctx.font="28px sans-serif";
+        ctx.font="28px DFKai-SB";
+
 
         ctx.strokeText(
     "感恩精舍祝您新春愉快",
