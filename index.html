@@ -5,49 +5,55 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>佛緣相機</title>
+<title>佛緣祈福打卡機</title>
 
 <style>
 
 body{
     margin:0;
-    font-family:"Microsoft JhengHei";
+    background:#f7f2dd;
+    font-family:"Microsoft JhengHei",sans-serif;
     text-align:center;
-    background:#f5f0d8;
 }
 
 h1{
-    color:#8a6d00;
-    margin-top:30px;
+    color:#8b6b00;
+    margin-top:20px;
 }
 
 video{
-    width:90%;
+    width:95%;
     max-width:500px;
     border-radius:15px;
-    margin-top:20px;
+    margin-top:10px;
 }
 
 canvas{
-    width:90%;
+    width:95%;
     max-width:500px;
     border-radius:15px;
-    margin-top:20px;
+    margin-top:15px;
+    border:3px solid #d4af37;
 }
 
 button{
     margin:10px;
     padding:15px 30px;
-    font-size:20px;
+    font-size:22px;
     background:#ffd700;
     border:none;
-    border-radius:10px;
+    border-radius:12px;
+    cursor:pointer;
 }
 
-#result{
-    font-size:30px;
-    color:#8a6d00;
-    margin-top:20px;
+button:hover{
+    background:#f5c400;
+}
+
+.result{
+    margin-top:15px;
+    font-size:28px;
+    color:#8b6b00;
 }
 
 </style>
@@ -55,25 +61,25 @@ button{
 
 <body>
 
-<h1>🙏 佛緣相機 🙏</h1>
+<h1>🙏 佛緣祈福打卡機 🙏</h1>
 
 <video id="video" autoplay playsinline></video>
 
 <br>
 
-<button onclick="takePhoto()">
-拍照
+<button onclick="capturePhoto()">
+開始祈福拍照
 </button>
-
-<button onclick="testFate()">
-測佛緣
-</button>
-
-<div id="result"></div>
 
 <br>
 
 <canvas id="canvas"></canvas>
+
+<br>
+
+<a id="downloadLink" style="display:none;">
+    <button>下載祈福照</button>
+</a>
 
 <script>
 
@@ -82,17 +88,17 @@ const video = document.getElementById('video');
 navigator.mediaDevices.getUserMedia({
     video:true
 })
-.then(stream=>{
-    video.srcObject=stream;
+.then(function(stream){
+    video.srcObject = stream;
 });
 
-function takePhoto(){
+function capturePhoto(){
 
     const canvas =
-        document.getElementById('canvas');
+        document.getElementById("canvas");
 
     const ctx =
-        canvas.getContext('2d');
+        canvas.getContext("2d");
 
     canvas.width =
         video.videoWidth;
@@ -108,19 +114,33 @@ function takePhoto(){
         canvas.height
     );
 
-}
+    const blessings = [
 
-function testFate(){
+      {score:"88", text:"善念常存"},
+      {score:"92", text:"福德增長"},
+      {score:"95", text:"廣結善緣"},
+      {score:"98", text:"吉祥圓滿"},
+      {score:"100", text:"佛光普照"}
 
-    const score =
-        Math.floor(Math.random()*21)+80;
+    ];
 
-    document.getElementById("result").innerHTML=
-        "佛緣指數："+score+"分";
+    const item =
+      blessings[Math.floor(Math.random()*blessings.length)];
 
-}
+    // 底部半透明背景
 
-</script>
+    ctx.fillStyle =
+      "rgba(0,0,0,0.55)";
 
-</body>
-</html>
+    ctx.fillRect(
+      0,
+      canvas.height-180,
+      canvas.width,
+      180
+    );
+
+    // 標題
+
+    ctx.fillStyle="gold";
+    ctx.font="bold 50px Microsoft JhengHei";
+    ctx
