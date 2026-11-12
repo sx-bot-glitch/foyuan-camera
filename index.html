@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>玉井感恩精舍 佛緣祈福</title>
+<title>玉井感恩精舍 佛緣祈福打卡機</title>
 
 <style>
+
 body{
     margin:0;
     padding:20px;
@@ -54,6 +56,7 @@ button:hover{
     font-weight:bold;
     margin:20px;
 }
+
 </style>
 </head>
 
@@ -86,9 +89,9 @@ muted>
 <br>
 
 <a id="downloadLink" style="display:none;">
-<button>
-下載祈福照
-</button>
+    <button>
+        下載祈福照
+    </button>
 </a>
 
 <button
@@ -120,8 +123,8 @@ navigator.mediaDevices
 .catch(function(error){
 
     alert(
-        "相機啟動失敗：" +
-        error.message
+      "相機啟動失敗："+
+      error.message
     );
 
 });
@@ -146,4 +149,333 @@ function capturePhoto(){
     .getElementById("loading")
     .style.display="block";
 
-    setTimeout(function()
+    setTimeout(function(){
+
+        document
+        .getElementById("loading")
+        .style.display="none";
+
+        canvas.width =
+        video.videoWidth;
+
+        canvas.height =
+        video.videoHeight;
+
+        ctx.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        // ===== 柔光佛光 =====
+
+const glow =
+ctx.createRadialGradient(
+    canvas.width/2,
+    canvas.height*0.6,
+    50,
+    canvas.width/2,
+    canvas.height*0.6,
+    canvas.width
+);
+
+glow.addColorStop(
+    0,
+    "rgba(255,245,200,0.35)"
+);
+
+glow.addColorStop(
+    0.5,
+    "rgba(255,215,0,0.12)"
+);
+
+glow.addColorStop(
+    1,
+    "rgba(255,215,0,0)"
+);
+
+ctx.fillStyle = glow;
+
+ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+);
+        for(let i=0;i<150;i++){
+
+    const x =
+    Math.random()*canvas.width;
+
+    const y =
+    Math.random()*canvas.height;
+
+    const size =
+    Math.random()*3+1;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        size,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle =
+    "rgba(255,240,200,0.35)";
+
+    ctx.fill();
+}
+
+        const cards=[
+
+            ["88","善念常存"],
+            ["92","福德增長"],
+            ["95","廣結善緣"],
+            ["98","吉祥圓滿"],
+            ["100","佛光普照"]
+
+        ];
+
+        const result =
+        cards[
+            Math.floor(
+                Math.random()*cards.length
+            )
+        ];
+const isLandscape =
+canvas.width > canvas.height;
+
+let infoX;
+let scoreY;
+let titleY;
+let textY;
+let templeY;
+let dateY;
+
+if(isLandscape){
+
+    infoX = canvas.width * 0.84;
+
+    scoreY = 180;
+    titleY = 230;
+    textY = 290;
+    templeY = 350;
+    dateY = 400;
+
+}else{
+
+    infoX = canvas.width / 2;
+
+    scoreY = canvas.height - 260;
+    titleY = canvas.height - 210;
+    textY = canvas.height - 160;
+    templeY = canvas.height - 110;
+    dateY = canvas.height - 60;
+
+}
+        ctx.textAlign="center";
+        ctx.shadowColor =
+"rgba(255,215,0,0.8)";
+
+ctx.shadowBlur = 20;
+
+ctx.strokeStyle="#c89b00";
+
+        ctx.fillStyle="gold";
+        ctx.font="bold 48px sans-serif";
+
+        ctx.strokeText(
+    "🙏 佛緣指數 " + result[0],
+    infoX,
+    scoreY
+);
+
+ctx.fillText(
+    "🙏 佛緣指數 " + result[0],
+    infoX,
+    scoreY
+);
+
+        ctx.fillStyle="white";
+        ctx.font="bold 34px sans-serif";
+
+        ctx.strokeText(
+    result[1],
+    infoX,
+    textY
+);
+
+ctx.fillText(
+    result[1],
+    infoX,
+    textY
+);
+
+        ctx.font="28px sans-serif";
+
+        ctx.strokeText(
+    "感恩精舍祝您新春愉快",
+    infoX,
+    templeY
+);
+
+ctx.fillText(
+    "感恩精舍祝您新春愉快",
+    infoX,
+    templeY
+);
+
+        const today =
+        new Date().toLocaleDateString();
+
+        ctx.font="22px sans-serif";
+
+        ctx.strokeText(
+    today,
+    infoX,
+    dateY
+);
+
+ctx.fillText(
+    today,
+    infoX,
+    dateY
+);
+
+        // ===== Logo =====
+
+        const logo = new Image();
+
+        logo.onload = function(){
+
+            ctx.save();
+
+ctx.globalAlpha = 0.75;
+
+ctx.filter =
+"sepia(100%) saturate(800%) hue-rotate(-50deg)";
+
+ctx.drawImage(
+    logo,
+    20,
+    canvas.height-95,
+    70,
+    70
+);
+
+ctx.restore();
+
+            finishImage();
+
+        };
+
+        logo.onerror = function(){
+
+            finishImage();
+
+        };
+
+        logo.src="logo.png";
+
+        function finishImage(){
+
+            // 金色外框
+
+            ctx.strokeStyle="gold";
+
+            ctx.lineWidth=14;
+
+            ctx.strokeRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+            const link =
+            document.getElementById(
+                "downloadLink"
+            );
+
+            link.href =
+            canvas.toDataURL(
+                "image/png"
+            );
+
+            link.download =
+            "感恩精舍祈福照.png";
+
+            link.style.display =
+            "inline-block";
+
+            document
+            .getElementById(
+                "shareBtn"
+            )
+            .style.display=
+            "inline-block";
+        }
+
+    },3500);
+
+}
+
+document
+.getElementById("shareBtn")
+.addEventListener(
+"click",
+sharePhoto
+);
+
+async function sharePhoto(){
+
+    try{
+
+        const response =
+        await fetch(
+            canvas.toDataURL("image/png")
+        );
+
+        const blob =
+        await response.blob();
+
+        const file =
+        new File(
+            [blob],
+            "感恩精舍祈福照.png",
+            {
+                type:"image/png"
+            }
+        );
+
+        if(navigator.share){
+
+            await navigator.share({
+                title:"感恩精舍祈福照",
+                text:"我在玉井感恩精舍完成佛緣打卡",
+                files:[file]
+            });
+
+        }else{
+
+            alert("此裝置不支援分享功能");
+
+        }
+
+    }catch(e){
+
+        console.log(e);
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
