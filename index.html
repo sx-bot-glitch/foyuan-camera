@@ -169,36 +169,67 @@ function capturePhoto(){
             canvas.height
         );
 
-        // ===== 佛光特效 =====
+        // ===== 柔光佛光 =====
 
-        const glow =
-        ctx.createRadialGradient(
-            canvas.width/2,
-            canvas.height/2,
-            50,
-            canvas.width/2,
-            canvas.height/2,
-            canvas.width/1.5
-        );
+const glow =
+ctx.createRadialGradient(
+    canvas.width/2,
+    canvas.height*0.6,
+    50,
+    canvas.width/2,
+    canvas.height*0.6,
+    canvas.width
+);
 
-        glow.addColorStop(
-            0,
-            "rgba(255,215,0,0.45)"
-        );
+glow.addColorStop(
+    0,
+    "rgba(255,245,200,0.35)"
+);
 
-        glow.addColorStop(
-            1,
-            "rgba(255,215,0,0.18)"
-        );
+glow.addColorStop(
+    0.5,
+    "rgba(255,215,0,0.12)"
+);
 
-        ctx.fillStyle=glow;
+glow.addColorStop(
+    1,
+    "rgba(255,215,0,0)"
+);
 
-        ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
+ctx.fillStyle = glow;
+
+ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+);
+        for(let i=0;i<150;i++){
+
+    const x =
+    Math.random()*canvas.width;
+
+    const y =
+    Math.random()*canvas.height;
+
+    const size =
+    Math.random()*3+1;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        size,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle =
+    "rgba(255,240,200,0.35)";
+
+    ctx.fill();
+}
 
         const cards=[
 
@@ -288,13 +319,13 @@ ctx.fillText(
         ctx.font="28px sans-serif";
 
         ctx.strokeText(
-    "玉井感恩精舍",
+    "感恩精舍祝您新春愉快",
     infoX,
     templeY
 );
 
 ctx.fillText(
-    "玉井感恩精舍",
+    "感恩精舍祝您新春愉快",
     infoX,
     templeY
 );
