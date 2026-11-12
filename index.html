@@ -1,110 +1,20 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>佛緣祈福打卡機</title>
-
-<style>
-
-body{
-    margin:0;
-    background:#f7f2dd;
-    font-family:"Microsoft JhengHei",sans-serif;
-    text-align:center;
-}
-
-h1{
-    color:#8b6b00;
-    margin-top:20px;
-}
-
-video{
-    width:95%;
-    max-width:500px;
-    border-radius:15px;
-    margin-top:10px;
-}
-
-canvas{
-    width:95%;
-    max-width:500px;
-    border-radius:15px;
-    margin-top:15px;
-    border:3px solid #d4af37;
-}
-
-button{
-    margin:10px;
-    padding:15px 30px;
-    font-size:22px;
-    background:#ffd700;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#f5c400;
-}
-
-.result{
-    margin-top:15px;
-    font-size:28px;
-    color:#8b6b00;
-}
-
-</style>
-</head>
-
-<body>
-
-<h1>🙏 佛緣祈福打卡機 🙏</h1>
-
-<video id="video" autoplay playsinline></video>
-
-<br>
-
-<button onclick="capturePhoto()">
-開始祈福拍照
-</button>
-
-<br>
-
-<canvas id="canvas"></canvas>
-
-<br>
-
-<a id="downloadLink" style="display:none;">
-    <button>下載祈福照</button>
-</a>
-
-<script>
-
-const video = document.getElementById('video');
-
-navigator.mediaDevices.getUserMedia({
-    video:true
-})
-.then(function(stream){
-    video.srcObject = stream;
-});
-
 function capturePhoto(){
 
     const canvas =
-        document.getElementById("canvas");
+      document.getElementById("canvas");
 
     const ctx =
-        canvas.getContext("2d");
+      canvas.getContext("2d");
 
-    canvas.width =
-        video.videoWidth;
+    if(video.videoWidth===0){
 
-    canvas.height =
-        video.videoHeight;
+        alert("相機尚未啟動完成，請等待2秒後再拍照");
+
+        return;
+    }
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
     ctx.drawImage(
         video,
@@ -114,33 +24,5 @@ function capturePhoto(){
         canvas.height
     );
 
-    const blessings = [
-
-      {score:"88", text:"善念常存"},
-      {score:"92", text:"福德增長"},
-      {score:"95", text:"廣結善緣"},
-      {score:"98", text:"吉祥圓滿"},
-      {score:"100", text:"佛光普照"}
-
-    ];
-
-    const item =
-      blessings[Math.floor(Math.random()*blessings.length)];
-
-    // 底部半透明背景
-
-    ctx.fillStyle =
-      "rgba(0,0,0,0.55)";
-
-    ctx.fillRect(
-      0,
-      canvas.height-180,
-      canvas.width,
-      180
-    );
-
-    // 標題
-
-    ctx.fillStyle="gold";
-    ctx.font="bold 50px Microsoft JhengHei";
-    ctx
+    alert("拍照成功");
+}
