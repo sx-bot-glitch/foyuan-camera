@@ -1,34 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>相機測試</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>玉井感恩精舍 佛緣祈福打卡機</title>
+
+<style>
+body{
+    margin:0;
+    padding:20px;
+    text-align:center;
+    background:#f7f2dd;
+    font-family:"Microsoft JhengHei",sans-serif;
+}
+
+h1{
+    color:#9c7300;
+}
+
+video,
+canvas{
+    width:95%;
+    max-width:600px;
+    border:4px solid #d4af37;
+    border-radius:15px;
+}
+
+button{
+    margin:15px;
+    padding:16px 40px;
+    font-size:24px;
+    border:none;
+    border-radius:12px;
+    background:#ffd700;
+    cursor:pointer;
+}
+
+#loading{
+    display:none;
+    font-size:24px;
+    color:#9c7300;
+    margin:15px;
+}
+</style>
 </head>
 
-<body style="text-align:center;">
+<body>
 
-<h1>相機測試</h1>
+<h1>🙏 佛緣祈福打卡機 🙏</h1>
+
+<h3>台南玉井感恩精舍</h3>
 
 <video
 id="video"
 autoplay
 playsinline
-style="width:600px;border:3px solid red;">
+muted>
 </video>
+
+<br>
+
+<button id="photoBtn">
+開始祈福拍攝
+</button>
+
+<div id="loading">
+🙏 正在感應佛緣...
+</div>
+
+<br>
+
+<canvas id="canvas"></canvas>
+
+<br>
+
+<a id="downloadLink" style="display:none;">
+<button>
+下載祈福照
+</button>
+</a>
 
 <script>
 
 const video =
 document.getElementById("video");
 
-navigator.mediaDevices
-.getUserMedia({
+const canvas =
+document.getElementById("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+navigator.mediaDevices.getUserMedia({
     video:true
 })
 .then(function(stream){
-
-    alert("相機連線成功");
 
     video.srcObject = stream;
 
@@ -36,11 +103,151 @@ navigator.mediaDevices
 .catch(function(error){
 
     alert(
-      "相機錯誤：" +
-      error.message
+      "相機啟動失敗："
+      + error.message
     );
 
 });
+
+document
+.getElementById("photoBtn")
+.addEventListener(
+"click",
+capturePhoto
+);
+
+function capturePhoto(){
+
+    if(video.videoWidth===0){
+
+        alert("相機尚未完成啟動");
+
+        return;
+    }
+
+    const loading =
+    document.getElementById("loading");
+
+    loading.style.display =
+    "block";
+
+    setTimeout(function(){
+
+        loading.style.display =
+        "none";
+
+        canvas.width =
+        video.videoWidth;
+
+        canvas.height =
+        video.videoHeight;
+
+        ctx.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        const cards = [
+
+          ["88","善念常存"],
+          ["92","福德增長"],
+          ["95","廣結善緣"],
+          ["98","吉祥圓滿"],
+          ["100","佛光普照"]
+
+        ];
+
+        const result =
+        cards[
+          Math.floor(
+            Math.random() *
+            cards.length
+          )
+        ];
+
+        ctx.fillStyle =
+        "rgba(0,0,0,0.65)";
+
+        ctx.fillRect(
+            0,
+            canvas.height-220,
+            canvas.width,
+            220
+        );
+
+        ctx.textAlign="center";
+
+        ctx.fillStyle="gold";
+        ctx.font="bold 48px Arial";
+
+        ctx.fillText(
+            "佛緣指數 " + result[0],
+            canvas.width/2,
+            canvas.height-150
+        );
+
+        ctx.fillStyle="white";
+        ctx.font="bold 34px Arial";
+
+        ctx.fillText(
+            result[1],
+            canvas.width/2,
+            canvas.height-100
+        );
+
+        ctx.font="28px Arial";
+
+        ctx.fillText(
+            "玉井感恩精舍",
+            canvas.width/2,
+            canvas.height-60
+        );
+
+        const today =
+        new Date().toLocaleDateString();
+
+        ctx.font="22px Arial";
+
+        ctx.fillText(
+            today,
+            canvas.width/2,
+            canvas.height-25
+        );
+
+        ctx.strokeStyle =
+        "gold";
+
+        ctx.lineWidth = 10;
+
+        ctx.strokeRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        const link =
+        document.getElementById(
+          "downloadLink"
+        );
+
+        link.href =
+        canvas.toDataURL(
+          "image/png"
+        );
+
+        link.download =
+        "感恩精舍祈福照.png";
+
+        link.style.display =
+        "inline-block";
+
+    },1000);
+
+}
 
 </script>
 
