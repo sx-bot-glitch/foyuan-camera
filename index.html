@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>玉井感恩精舍 佛緣祈福打卡機</title>
+<title>感恩精舍佛緣打卡機</title>
 
 <style>
-
 body{
     margin:0;
     padding:20px;
@@ -17,8 +16,7 @@ body{
 }
 
 h1{
-    color:#9c7300;
-    margin-bottom:10px;
+    color:#a57800;
 }
 
 h3{
@@ -29,14 +27,14 @@ h3{
 video,
 canvas{
     width:95%;
-    max-width:550px;
+    max-width:600px;
     border:4px solid #d4af37;
     border-radius:15px;
 }
 
 button{
     margin:15px;
-    padding:15px 40px;
+    padding:16px 40px;
     font-size:24px;
     border:none;
     border-radius:12px;
@@ -44,37 +42,27 @@ button{
     cursor:pointer;
 }
 
-button:hover{
-    background:#f5c400;
-}
-
 #loading{
     display:none;
-    color:#9c7300;
+    margin:15px;
+    color:#a57800;
     font-size:24px;
     font-weight:bold;
-    margin:20px;
 }
-
 </style>
-
 </head>
+
 <body>
 
 <h1>🙏 佛緣祈福打卡機 🙏</h1>
 <h3>台南玉井感恩精舍</h3>
 
-<video
-id="video"
-autoplay
-playsinline
-muted>
-</video>
+<video id="video" autoplay playsinline muted></video>
 
 <br>
 
 <button onclick="capturePhoto()">
-開始祈福拍照
+開始祈福拍攝
 </button>
 
 <div id="loading">
@@ -88,21 +76,72 @@ muted>
 <br>
 
 <a id="downloadLink" style="display:none;">
-    <button>
-        下載祈福紀念照
-    </button>
+<button>
+下載祈福照
+</button>
 </a>
 
 <script>
 
-const video =
-document.getElementById("video");
+const video = document.getElementById("video");
 
 navigator.mediaDevices.getUserMedia({
-    video:true
+    video:{
+        facingMode:"environment"
+    }
 })
 .then(function(stream){
+
     video.srcObject = stream;
+
 })
-.catch(function(err){
-    alert("無法
+.catch(function(error){
+
+    alert("相機啟動失敗：" + error.message);
+
+});
+
+function capturePhoto(){
+
+    if(video.videoWidth===0){
+
+        alert("請等待相機啟動完成");
+
+        return;
+    }
+
+    const loading =
+    document.getElementById("loading");
+
+    loading.style.display="block";
+
+    setTimeout(function(){
+
+        loading.style.display="none";
+
+        const canvas =
+        document.getElementById("canvas");
+
+        const ctx =
+        canvas.getContext("2d");
+
+        canvas.width =
+        video.videoWidth;
+
+        canvas.height =
+        video.videoHeight;
+
+        ctx.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        const data = [
+
+            {score:"88",text:"善念常存"},
+            {score:"92",text:"福德增長"},
+            {score:"95",text:"廣結善緣"},
+            {
