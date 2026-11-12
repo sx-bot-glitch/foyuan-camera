@@ -1,20 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>佛緣祈福打卡機</title>
+
+<style>
+body{
+    margin:0;
+    padding:20px;
+    text-align:center;
+    background:#f7f2dd;
+    font-family:"Microsoft JhengHei",sans-serif;
+}
+
+h1{
+    color:#9c7300;
+}
+
+video,canvas{
+    width:95%;
+    max-width:500px;
+    border:3px solid #d4af37;
+    border-radius:15px;
+}
+
+button{
+    margin:20px;
+    padding:15px 40px;
+    font-size:24px;
+    border:none;
+    border-radius:12px;
+    background:#ffd700;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🙏 佛緣祈福打卡機 🙏</h1>
+
+<video
+    id="video"
+    autoplay
+    playsinline
+    muted>
+</video>
+
+<br>
+
+<button onclick="capturePhoto()">
+開始祈福拍照
+</button>
+
+<br>
+
+<canvas id="canvas"></canvas>
+
+<br>
+
+<a id="downloadLink" style="display:none">
+    <button>下載祈福照</button>
+</a>
+
+<script>
+
+const video =
+document.getElementById("video");
+
+navigator.mediaDevices.getUserMedia({
+    video:true
+})
+.then(function(stream){
+    video.srcObject = stream;
+})
+.catch(function(err){
+    alert("無法啟用相機：" + err.message);
+});
+
 function capturePhoto(){
 
-    const canvas =
-      document.getElementById("canvas");
-
-    const ctx =
-      canvas.getContext("2d");
-
     if(video.videoWidth===0){
-
-        alert("相機尚未啟動完成，請等待2秒後再拍照");
-
+        alert("請等待相機啟動");
         return;
     }
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const canvas =
+        document.getElementById("canvas");
+
+    const ctx =
+        canvas.getContext("2d");
+
+    canvas.width =
+        video.videoWidth;
+
+    canvas.height =
+        video.videoHeight;
 
     ctx.drawImage(
         video,
@@ -24,5 +107,88 @@ function capturePhoto(){
         canvas.height
     );
 
-    alert("拍照成功");
+    const data = [
+
+        {
+            score:"88",
+            text:"善念常存"
+        },
+        {
+            score:"92",
+            text:"福德增長"
+        },
+        {
+            score:"95",
+            text:"廣結善緣"
+        },
+        {
+            score:"98",
+            text:"吉祥圓滿"
+        },
+        {
+            score:"100",
+            text:"佛光普照"
+        }
+
+    ];
+
+    const result =
+      data[Math.floor(Math.random()*data.length)];
+
+    ctx.fillStyle =
+      "rgba(0,0,0,0.6)";
+
+    ctx.fillRect(
+      0,
+      canvas.height-180,
+      canvas.width,
+      180
+    );
+
+    ctx.fillStyle="gold";
+    ctx.font="bold 40px sans-serif";
+    ctx.textAlign="center";
+
+    ctx.fillText(
+      "佛緣指數 " + result.score,
+      canvas.width/2,
+      canvas.height-120
+    );
+
+    ctx.fillStyle="white";
+    ctx.font="30px sans-serif";
+
+    ctx.fillText(
+      result.text,
+      canvas.width/2,
+      canvas.height-70
+    );
+
+    const today =
+      new Date().toLocaleDateString();
+
+    ctx.font="20px sans-serif";
+
+    ctx.fillText(
+      today,
+      canvas.width/2,
+      canvas.height-30
+    );
+
+    const link =
+      document.getElementById("downloadLink");
+
+    link.href =
+      canvas.toDataURL("image/png");
+
+    link.download =
+      "佛緣祈福照.png";
+
+    link.style.display =
+      "inline-block";
 }
+
+</script>
+
+</body>
+</html>
