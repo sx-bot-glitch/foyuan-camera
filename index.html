@@ -10,108 +10,36 @@
             margin: 0;
             padding: 0;
             font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
-            background-color: #1a1a1a;
+            background-color: #000;
             color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
             overflow: hidden;
+            width: 100vw;
+            height: 100vh;
         }
-        /* 主畫面容器 */
+        /* 主畫面容器（永遠顯示相機） */
         .container {
             position: relative;
             width: 100vw;
             height: 100vh;
-            max-width: 100%;
-            max-height: 100%;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: #000;
-        }
-        /* 初始歡迎畫面 */
-        #start-screen {
-            position: absolute;
-            inset: 0;
-            z-index: 30;
-            background: radial-gradient(circle, #3a2312 0%, #140b05 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-        }
-        #start-screen img {
-            max-width: 80%;
-            max-height: 55vh;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(255, 200, 100, 0.3);
-            margin-bottom: 30px;
-            object-fit: contain;
-        }
-        /* 按鈕樣式 */
-        .btn {
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            color: #4a2500;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4);
-            transition: transform 0.2s;
-        }
-        .btn:active {
-            transform: scale(0.95);
-        }
-        /* 感應中過場畫面 */
-        #loading-screen {
-            position: absolute;
-            inset: 0;
-            z-index: 25;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .pulse-text {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #ffd700;
-            letter-spacing: 3px;
-            animation: pulse 1.2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.4; transform: scale(0.98); }
-            50% { opacity: 1; transform: scale(1.05); }
-        }
-        /* 相機與圖框預覽區 */
-        #camera-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: none;
-            align-items: center;
-            justify-content: center;
+            background: #1a1a1a;
             overflow: hidden;
         }
+        /* 即時自拍鏡頭 */
         #video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        /* 前鏡頭鏡像翻轉 */
         .mirror {
             transform: scaleX(-1);
         }
+        /* 佛緣圖框覆蓋層（感應完成後才顯示） */
         #frame-overlay {
             position: absolute;
             inset: 0;
@@ -120,31 +48,140 @@
             object-fit: fill;
             pointer-events: none;
             z-index: 10;
+            display: none;
         }
-        /* 底部控制列 */
-        .controls {
+        /* 右上角翻轉鏡頭小按鈕（初始與拍照時皆可使用） */
+        #top-switch-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 25;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(5px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        /* 右下角紅色「開始感應」圓形按鈕（還原您的設計圖） */
+        #start-btn-wrapper {
+            position: absolute;
+            right: 28px;
+            bottom: 35px;
+            z-index: 20;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.15s;
+        }
+        #start-btn-wrapper:active {
+            transform: scale(0.92);
+        }
+        .red-circle-btn {
+            position: relative;
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 30%, #ff4d4d 0%, #d91e18 65%, #960000 100%);
+            border: 6px solid #b5b5b5;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 2px 6px rgba(255, 255, 255, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: 900;
+            font-size: 1.25rem;
+            line-height: 1.15;
+            letter-spacing: 1px;
+        }
+        /* 按鈕上半部白色反光高光 */
+        .red-circle-btn::before {
+            content: "";
+            position: absolute;
+            top: 4px;
+            left: 16%;
+            width: 68%;
+            height: 36%;
+            border-radius: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(255,255,255,0.1));
+            pointer-events: none;
+        }
+        /* 點擊提示手指與波紋動畫 */
+        .tap-finger {
+            position: absolute;
+            right: -12px;
+            bottom: -18px;
+            font-size: 2.3rem;
+            transform: rotate(-20deg);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            animation: fingerTap 1.4s infinite ease-in-out;
+            pointer-events: none;
+        }
+        @keyframes fingerTap {
+            0%, 100% { transform: rotate(-20deg) scale(1); }
+            50% { transform: rotate(-20deg) scale(0.88) translate(-3px, -3px); }
+        }
+        /* 3.5秒「佛緣感應中...」半透明遮罩（背景仍看得到自己） */
+        #loading-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 30;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(2px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .pulse-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+            letter-spacing: 3px;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(0.96); }
+            50% { opacity: 1; transform: scale(1.06); }
+        }
+        /* 感應完成後的底部拍照控制列 */
+        #photo-controls {
             position: absolute;
             bottom: 30px;
             z-index: 20;
-            display: flex;
+            display: none;
             gap: 15px;
             align-items: center;
         }
+        .action-btn {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #4a2500;
+            border: none;
+            padding: 14px 34px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
         .sub-btn {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(5px);
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.5);
-            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.6);
+            padding: 12px 20px;
             font-size: 1rem;
             border-radius: 30px;
             cursor: pointer;
         }
-        /* 拍照結果畫面 */
+        /* 拍照結果與下載畫面 */
         #result-screen {
             position: absolute;
             inset: 0;
-            z-index: 35;
+            z-index: 40;
             background: #111;
             display: none;
             flex-direction: column;
@@ -157,165 +194,120 @@
             max-height: 70vh;
             border-radius: 12px;
             border: 2px solid #ffd700;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .tip-text {
             font-size: 0.95rem;
-            color: #ccc;
+            color: #ddd;
             margin-bottom: 15px;
+            text-align: center;
+        }
+        /* 若相機未自動開啟時的備用啟動提示 */
+        #camera-permission-tip {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            text-align: center;
+            color: #ccc;
+            display: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- 1. 初始畫面 -->
-    <div id="start-screen">
-        <!-- 首頁封面圖支援 cover.gif 或 cover.png (若無此圖會自動隱藏) -->
-        <img id="cover-img" src="cover.gif" alt="佛緣感應封面" onerror="if(this.src.endsWith('.gif')){this.src='cover.png'}else{this.style.display='none'}">
-        <h2 style="color: #ffd700; margin-bottom: 25px;">✨ 測測您的新春佛緣指數 ✨</h2>
-        <button class="btn" onclick="startSensing()">開始感應</button>
+<div class="container" id="camera-container">
+    <!-- 相機權限備用提示 -->
+    <div id="camera-permission-tip">
+        <p style="margin-bottom: 12px;">📷 需要開啟相機才能自拍打卡</p>
+        <button class="sub-btn" onclick="initCamera()">點此開啟相機</button>
     </div>
 
-    <!-- 2. 佛緣感應中 (3.5秒) -->
-    <div id="loading-screen">
+    <!-- 1. 即時自拍畫面 -->
+    <video id="video" autoplay playsinline muted></video>
+
+    <!-- 2. 隨機抽出的佛緣圖框 -->
+    <img id="frame-overlay" src="" alt="佛緣圖框">
+
+    <!-- 右上角翻轉鏡頭 -->
+    <button id="top-switch-btn" type="button">🔄 翻轉鏡頭</button>
+
+    <!-- 3. 初始狀態：右下角紅色「開始感應」圓形按鈕 -->
+    <div id="start-btn-wrapper" role="button" aria-label="開始感應">
+        <div class="red-circle-btn">
+            <span>開始</span>
+            <span>感應</span>
+        </div>
+        <div class="tap-finger">👆</div>
+    </div>
+
+    <!-- 4. 感應中過場提示 (3.5秒) -->
+    <div id="loading-overlay">
         <div class="pulse-text">🙏 佛緣感應中...</div>
     </div>
 
-    <!-- 3. 相機與圖框畫面 -->
-    <div id="camera-container">
-        <video id="video" autoplay playsinline></video>
-        <img id="frame-overlay" src="" alt="佛緣圖框">
-        
-        <div class="controls">
-            <button class="sub-btn" onclick="switchCamera()">🔄 翻轉鏡頭</button>
-            <button class="btn" onclick="takePhoto()">📸 拍照留念</button>
-            <button class="sub-btn" onclick="resetAll()">重新感應</button>
-        </div>
+    <!-- 5. 感應完成後：底部拍照與重新感應列 -->
+    <div id="photo-controls">
+        <button id="btn-capture" class="action-btn" type="button">📸 拍照留念</button>
+        <button id="btn-reset" class="sub-btn" type="button">重新感應</button>
     </div>
 
-    <!-- 4. 拍照結果與下載畫面 -->
+    <!-- 6. 拍照結果與下載畫面 -->
     <div id="result-screen">
         <img id="captured-photo" src="" alt="拍照結果">
         <p class="tip-text">💡 手機請「長按圖片」儲存，或點擊下方按鈕下載</p>
         <div style="display: flex; gap: 15px;">
-            <a id="download-link" class="btn" download="佛緣感應打卡.png" style="text-decoration: none;">⬇️ 下載照片</a>
-            <button class="sub-btn" onclick="retakePhoto()">重拍一張</button>
+            <a id="download-link" class="action-btn" download="佛緣感應打卡.png" style="text-decoration: none;">⬇️ 下載照片</a>
+            <button id="btn-retake" class="sub-btn" type="button">重拍一張</button>
         </div>
     </div>
 </div>
 
-<!-- 用於合成照片的隱藏畫布 -->
 <canvas id="canvas" style="display: none;"></canvas>
 
 <script>
-    // ==========================================
-    // 圖片設定區：已全數修改為 .gif 格式
-    // ==========================================
     const frames = [
-        { vertical: 'pic1_L.gif', horizontal: 'pic1.gif' }, // 第1組
-        { vertical: 'pic2_L.gif', horizontal: 'pic2.gif' }, // 第2組
-        { vertical: 'pic3_L.gif', horizontal: 'pic3.gif' }, // 第3組
-        { vertical: 'pic4_L.gif', horizontal: 'pic4.gif' }, // 第4組
-        { vertical: 'pic5_L.gif', horizontal: 'pic5.gif' }  // 第5組
+        { vertical: 'pic1_L.gif', horizontal: 'pic1.gif' },
+        { vertical: 'pic2_L.gif', horizontal: 'pic2.gif' },
+        { vertical: 'pic3_L.gif', horizontal: 'pic3.gif' },
+        { vertical: 'pic4_L.gif', horizontal: 'pic4.gif' },
+        { vertical: 'pic5_L.gif', horizontal: 'pic5.gif' }
     ];
 
     let selectedFrameIndex = 0;
     let currentStream = null;
-    let useFrontCamera = true; // 預設開啟前鏡頭自拍
+    let useFrontCamera = true;
+    let cameraReady = false;
+    let hasSensed = false;
 
     const video = document.getElementById('video');
     const frameOverlay = document.getElementById('frame-overlay');
-    const startScreen = document.getElementById('start-screen');
-    const loadingScreen = document.getElementById('loading-screen');
-    const cameraContainer = document.getElementById('camera-container');
+    const startBtnWrapper = document.getElementById('start-btn-wrapper');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const photoControls = document.getElementById('photo-controls');
     const resultScreen = document.getElementById('result-screen');
+    const cameraContainer = document.getElementById('camera-container');
+    const permissionTip = document.getElementById('camera-permission-tip');
 
-    // 點擊「開始感應」
-    async function startSensing() {
-        await initCamera();
+    // 網頁一載入，立刻啟動前置自拍相機
+    window.addEventListener('DOMContentLoaded', () => {
+        initCamera();
+    });
 
-        startScreen.style.display = 'none';
-        loadingScreen.style.display = 'flex';
-
-        // 隨機抽出 0 ~ 4 的其中一種結果
-        selectedFrameIndex = Math.floor(Math.random() * frames.length);
-
-        // 等待 3.5 秒 (3500 毫秒)
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-            cameraContainer.style.display = 'flex';
-            updateFrameOrientation();
-        }, 3500);
-    }
+    // 綁定所有按鈕事件
+    startBtnWrapper.addEventListener('click', startSensing);
+    document.getElementById('top-switch-btn').addEventListener('click', switchCamera);
+    document.getElementById('btn-capture').addEventListener('click', takePhoto);
+    document.getElementById('btn-reset').addEventListener('click', resetSensing);
+    document.getElementById('btn-retake').addEventListener('click', retakePhoto);
 
     // 啟動相機
     async function initCamera() {
-        if (currentStream) {
-            currentStream.getTracks().forEach(track => track.stop());
+        cameraReady = false;
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            permissionTip.style.display = 'block';
+            return;
         }
-        const constraints = {
-            video: {
-                facingMode: useFrontCamera ? 'user' : 'environment',
-                width: { ideal: 1920 },
-                height: { ideal: 1080 }
-            },
-            audio: false
-        };
 
-        try {
-            currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-            video.srcObject = currentStream;
-            if (useFrontCamera) {
-                video.classList.add('mirror');
-            } else {
-                video.classList.remove('mirror');
-            }
-        } catch (err) {
-            alert('無法開啟相機，請確認瀏覽器已允許相機權限，並使用 HTTPS 網址開啟。');
-            console.error(err);
-        }
-    }
-
-    // 切換前後鏡頭
-    async function switchCamera() {
-        useFrontCamera = !useFrontCamera;
-        await initCamera();
-    }
-
-    // 根據手機直拿或橫拿，自動切換直式(_L.gif)或橫式(.gif)圖框
-    function updateFrameOrientation() {
-        const isLandscape = window.innerWidth > window.innerHeight;
-        const chosenSet = frames[selectedFrameIndex];
-        frameOverlay.src = isLandscape ? chosenSet.horizontal : chosenSet.vertical;
-    }
-
-    // 監聽螢幕旋轉事件
-    window.addEventListener('resize', () => {
-        if (cameraContainer.style.display === 'flex') {
-            updateFrameOrientation();
-        }
-    });
-
-    // 拍照並合成圖框
-    function takePhoto() {
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-
-        // 設定畫布解析度與目前螢幕比例一致
-        const width = cameraContainer.clientWidth;
-        const height = cameraContainer.clientHeight;
-        canvas.width = width;
-        canvas.height = height;
-
-        // 計算 video 滿版裁切比例
-        const videoRatio = video.videoWidth / video.videoHeight;
-        const screenRatio = width / height;
-        let drawWidth, drawHeight, startX, startY;
-
-        if (videoRatio > screenRatio) {
-            drawHeight = height;
-            drawWidth = height * videoRatio;
-            startX = (width - drawWidth) / 2;
-            startY = 0;
-        } else {
