@@ -2,140 +2,94 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>感恩精舍 - 佛緣感應拍照打卡</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>佛緣感應拍照打卡</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: #000; color: #fff; overflow: hidden; width: 100vw; height: 100vh; }
-.container { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: #1a1a1a; overflow: hidden; }
-#video { width: 100%; height: 100%; object-fit: cover; }
-.mirror { transform: scaleX(-1); }
-#frame-overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; z-index: 10; display: none; }
-#top-switch-btn { position: absolute; top: 20px; right: 20px; z-index: 25; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.5); padding: 8px 16px; font-size: 0.95rem; border-radius: 30px; cursor: pointer; }
-#start-btn-wrapper { position: absolute; right: 28px; bottom: 35px; z-index: 20; cursor: pointer; user-select: none; }
-#start-btn-wrapper:active { transform: scale(0.92); }
-.red-circle-btn { position: relative; width: 96px; height: 96px; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #ff4d4d 0%, #d91e18 65%, #960000 100%); border: 6px solid #b5b5b5; box-shadow: 0 6px 18px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #000; font-weight: 900; font-size: 1.25rem; line-height: 1.15; }
-.red-circle-btn::before { content: ""; position: absolute; top: 4px; left: 16%; width: 68%; height: 36%; border-radius: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(255,255,255,0.1)); }
-.tap-finger { position: absolute; right: -12px; bottom: -18px; font-size: 2.3rem; transform: rotate(-20deg); animation: fingerTap 1.4s infinite; pointer-events: none; }
-@keyframes fingerTap { 0%, 100% { transform: rotate(-20deg) scale(1); } 50% { transform: rotate(-20deg) scale(0.88); } }
-#loading-overlay { position: absolute; inset: 0; z-index: 30; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; }
-.pulse-text { font-size: 2rem; font-weight: bold; color: #ffd700; text-shadow: 0 2px 10px #000; letter-spacing: 3px; animation: pulse 1s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.96); } 50% { opacity: 1; transform: scale(1.06); } }
-#photo-controls { position: absolute; bottom: 30px; z-index: 20; display: none; gap: 15px; align-items: center; }
-.action-btn { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #4a2500; border: none; padding: 14px 34px; font-size: 1.2rem; font-weight: bold; border-radius: 50px; cursor: pointer; text-decoration: none; }
-.sub-btn { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.6); padding: 12px 20px; font-size: 1rem; border-radius: 30px; cursor: pointer; }
-#result-screen { position: absolute; inset: 0; z-index: 40; background: #111; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-#captured-photo { max-width: 90%; max-height: 70vh; border-radius: 12px; border: 2px solid #ffd700; margin-bottom: 18px; }
-.tip-text { font-size: 0.95rem; color: #ddd; margin-bottom: 15px; text-align: center; }
-#camera-permission-tip { position: absolute; z-index: 5; text-align: center; color: #ccc; display: none; }
+*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif;-webkit-tap-highlight-color:transparent}
+body,.box{width:100vw;height:100dvh;overflow:hidden;background:#000;color:#fff;position:relative;display:flex;align-items:center;justify-content:center}
+#video{width:100%;height:100%;object-fit:cover}
+.mirror{transform:scaleX(-1)}
+#frame,#ing{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:10;display:none}
+#ing{z-index:15}
+#sw{position:absolute;top:20px;right:20px;z-index:25;background:rgba(0,0,0,.5);color:#fff;border:1px solid #fff8;padding:8px 16px;border-radius:30px}
+#start-wrap{position:absolute;right:28px;bottom:35px;z-index:20;cursor:pointer}
+.red-btn{position:relative;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#ff4d4d,#d91e18 65%,#960000);border:6px solid #b5b5b5;box-shadow:0 6px 18px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:1.25rem;line-height:1.15}
+.finger{position:absolute;right:-12px;bottom:-18px;font-size:2.3rem;transform:rotate(-20deg);animation:tap 1.4s infinite;pointer-events:none}
+@keyframes tap{0%,100%{transform:rotate(-20deg) scale(1)}50%{transform:rotate(-20deg) scale(.88)}}
+#ctrls{position:absolute;bottom:30px;z-index:20;display:none;gap:15px}
+@media(orientation:portrait){
+#start-wrap{bottom:95px}
+#ctrls{bottom:90px}
+#frame,#ing{top:-25px;height:calc(100% - 25px)}
+}
+.btn{background:linear-gradient(135deg,#f6d365,#fda085);color:#4a2500;border:none;padding:14px 28px;font-size:1.1rem;font-weight:bold;border-radius:50px;text-decoration:none}
+.sh{background:linear-gradient(135deg,#84fab0,#8fd3f4);color:#00334e}
+.sub{background:rgba(0,0,0,.6);color:#fff;border:1px solid #fff9;padding:12px 18px;border-radius:30px}
+#res{position:absolute;inset:0;z-index:40;background:#111;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#photo{max-width:90%;max-height:65vh;border-radius:12px;border:2px solid #ffd700;margin-bottom:15px}
+#tip{position:absolute;z-index:5;text-align:center;display:none}
 </style>
 </head>
 <body>
-<div class="container" id="camera-container">
-    <div id="camera-permission-tip">
-        <p style="margin-bottom: 12px;">📷 需要開啟相機才能自拍打卡</p>
-        <button class="sub-btn" id="btn-retry-cam" type="button">點此開啟相機</button>
-    </div>
-    <video id="video" autoplay playsinline muted></video>
-    <img id="frame-overlay" src="" alt="佛緣圖框">
-    <button id="top-switch-btn" type="button">🔄 翻轉鏡頭</button>
-    <div id="start-btn-wrapper" role="button">
-        <div class="red-circle-btn"><span>開始</span><span>感應</span></div>
-        <div class="tap-finger">👆</div>
-    </div>
-    <div id="loading-overlay"><div class="pulse-text">🙏 佛緣感應中...</div></div>
-    <div id="photo-controls">
-        <button id="btn-capture" class="action-btn" type="button">📸 拍照留念</button>
-        <button id="btn-reset" class="sub-btn" type="button">重新感應</button>
-    </div>
-    <div id="result-screen">
-        <img id="captured-photo" src="" alt="拍照結果">
-        <p class="tip-text">💡 手機請「長按圖片」儲存，或點擊下方按鈕下載</p>
-        <div style="display: flex; gap: 15px;">
-            <a id="download-link" class="action-btn" download="佛緣感應打卡.png">⬇️ 下載照片</a>
-            <button id="btn-retake" class="sub-btn" type="button">重拍一張</button>
-        </div>
-    </div>
+<div class="box" id="box">
+<div id="tip"><p style="margin-bottom:10px">📷 需要相機權限</p><button class="sub" id="retry">開啟相機</button></div>
+<video id="video" autoplay playsinline muted></video>
+<img id="ing"><img id="frame">
+<button id="sw">🔄 翻轉</button>
+<div id="start-wrap"><div class="red-btn"><span>開始</span><span>感應</span></div><div class="finger">👆</div></div>
+<div id="ctrls"><button id="cap" class="btn">📸 拍照</button><button id="rst" class="sub">重新感應</button></div>
+<div id="res">
+<img id="photo">
+<p style="font-size:.9rem;color:#ccc;margin-bottom:12px">💡 點擊下載或分享，也可長按圖片儲存</p>
+<div style="display:flex;gap:12px"><a id="dl" class="btn" download="佛緣感應.png">⬇️ 下載</a><button id="sh" class="btn sh">📤 分享</button><button id="ret" class="sub">重拍</button></div>
 </div>
-<canvas id="canvas" style="display: none;"></canvas>
+</div>
+<canvas id="cv" style="display:none"></canvas>
 <script>
-const frames = [
-    { vertical: 'pic1_L.gif', horizontal: 'pic1.gif' },
-    { vertical: 'pic2_L.gif', horizontal: 'pic2.gif' },
-    { vertical: 'pic3_L.gif', horizontal: 'pic3.gif' },
-    { vertical: 'pic4_L.gif', horizontal: 'pic4.gif' },
-    { vertical: 'pic5_L.gif', horizontal: 'pic5.gif' }
-];
-let selectedFrameIndex = 0, currentStream = null, useFrontCamera = true, cameraReady = false, hasSensed = false;
-const video = document.getElementById('video'), frameOverlay = document.getElementById('frame-overlay'), startBtnWrapper = document.getElementById('start-btn-wrapper'), loadingOverlay = document.getElementById('loading-overlay'), photoControls = document.getElementById('photo-controls'), resultScreen = document.getElementById('result-screen'), cameraContainer = document.getElementById('camera-container'), permissionTip = document.getElementById('camera-permission-tip');
-
-window.addEventListener('DOMContentLoaded', initCamera);
-document.getElementById('btn-retry-cam').addEventListener('click', initCamera);
-startBtnWrapper.addEventListener('click', startSensing);
-document.getElementById('top-switch-btn').addEventListener('click', async () => { useFrontCamera = !useFrontCamera; await initCamera(); });
-document.getElementById('btn-capture').addEventListener('click', takePhoto);
-document.getElementById('btn-reset').addEventListener('click', () => { hasSensed = false; frameOverlay.style.display = 'none'; photoControls.style.display = 'none'; startBtnWrapper.style.display = 'block'; });
-document.getElementById('btn-retake').addEventListener('click', () => { resultScreen.style.display = 'none'; });
-
-async function initCamera() {
-    cameraReady = false;
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { permissionTip.style.display = 'block'; return; }
-    if (currentStream) { currentStream.getTracks().forEach(t => t.stop()); }
-    try {
-        currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: useFrontCamera ? 'user' : 'environment' }, audio: false });
-        video.srcObject = currentStream;
-        await video.play();
-        cameraReady = true;
-        permissionTip.style.display = 'none';
-        video.classList.toggle('mirror', useFrontCamera);
-    } catch (err) {
-        permissionTip.style.display = 'block';
-    }
+const F=[{v:'pic1_L.gif',h:'pic1.gif'},{v:'pic2_L.gif',h:'pic2.gif'},{v:'pic3_L.gif',h:'pic3.gif'},{v:'pic4_L.gif',h:'pic4.gif'},{v:'pic5_L.gif',h:'pic5.gif'}];
+let idx=0,st=null,front=true,ok=false,mode='idle',url='';
+const $=id=>document.getElementById(id),v=$('video'),ing=$('ing'),fr=$('frame');
+window.onload=cam;$('retry').onclick=cam;
+$('sw').onclick=async()=>{front=!front;await cam()};
+$('rst').onclick=()=>{mode='idle';ing.style.display=fr.style.display=$('ctrls').style.display='none';$('start-wrap').style.display='block'};
+$('ret').onclick=()=>$('res').style.display='none';
+$('start-wrap').onclick=()=>{
+if(!ok)cam();mode='ing';$('start-wrap').style.display='none';upd();ing.style.display='block';
+idx=Math.floor(Math.random()*5);
+setTimeout(()=>{mode='res';ing.style.display='none';upd();fr.style.display='block';$('ctrls').style.display='flex'},3500);
+};
+function upd(){
+const L=window.innerWidth>window.innerHeight;
+if(mode=='ing')ing.src=L?'ing.gif':'ing_L.gif';
+if(mode=='res')fr.src=L?F[idx].h:F[idx].v;
 }
-
-function startSensing() {
-    if (!cameraReady) initCamera();
-    startBtnWrapper.style.display = 'none';
-    loadingOverlay.style.display = 'flex';
-    selectedFrameIndex = Math.floor(Math.random() * frames.length);
-    setTimeout(() => {
-        loadingOverlay.style.display = 'none';
-        hasSensed = true;
-        updateFrameOrientation();
-        frameOverlay.style.display = 'block';
-        photoControls.style.display = 'flex';
-    }, 3500);
+window.onresize=upd;
+async function cam(){
+ok=false;if(!navigator.mediaDevices)return $('tip').style.display='block';
+if(st)st.getTracks().forEach(t=>t.stop());
+try{
+st=await navigator.mediaDevices.getUserMedia({video:{facingMode:front?'user':'environment'}});
+v.srcObject=st;await v.play();ok=true;$('tip').style.display='none';v.classList.toggle('mirror',front);
+}catch(e){$('tip').style.display='block'}
 }
-
-function updateFrameOrientation() {
-    if (!hasSensed) return;
-    const isLandscape = window.innerWidth > window.innerHeight;
-    frameOverlay.src = isLandscape ? frames[selectedFrameIndex].horizontal : frames[selectedFrameIndex].vertical;
+$('cap').onclick=()=>{
+const cv=$('cv'),c=cv.getContext('2d'),w=$('box').clientWidth,h=$('box').clientHeight;
+cv.width=w;cv.height=h;
+if(ok&&v.videoWidth){
+const vr=v.videoWidth/v.videoHeight,sr=w/h;
+let dw=vr>sr?h*vr:w,dh=vr>sr?h:w/vr,sx=(w-dw)/2,sy=(h-dh)/2;
+c.save();if(front){c.translate(w,0);c.scale(-1,1)}c.drawImage(v,sx,sy,dw,dh);c.restore();
 }
-window.addEventListener('resize', updateFrameOrientation);
-
-function takePhoto() {
-    const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
-    const w = cameraContainer.clientWidth, h = cameraContainer.clientHeight;
-    canvas.width = w; canvas.height = h;
-    if (cameraReady && video.videoWidth > 0) {
-        const vRatio = video.videoWidth / video.videoHeight, sRatio = w / h;
-        let dw, dh, sx, sy;
-        if (vRatio > sRatio) { dh = h; dw = h * vRatio; sx = (w - dw) / 2; sy = 0; }
-        else { dw = w; dh = w / vRatio; sx = 0; sy = (h - dh) / 2; }
-        ctx.save();
-        if (useFrontCamera) { ctx.translate(w, 0); ctx.scale(-1, 1); }
-        ctx.drawImage(video, sx, sy, dw, dh);
-        ctx.restore();
-    } else {
-        ctx.fillStyle = '#222'; ctx.fillRect(0, 0, w, h);
-    }
-    ctx.drawImage(frameOverlay, 0, 0, w, h);
-    const dataURL = canvas.toDataURL('image/png');
-    document.getElementById('captured-photo').src = dataURL;
-    document.getElementById('download-link').href = dataURL;
-    resultScreen.style.display = 'flex';
-}
+c.drawImage(fr,0,window.innerHeight>window.innerWidth?-25:0,w,window.innerHeight>window.innerWidth?h-25:h);
+url=cv.toDataURL('image/png');$('photo').src=$('dl').href=url;$('res').style.display='flex';
+};
+$('sh').onclick=async()=>{
+try{
+const b=await(await fetch(url)).blob(),f=new File([b],'佛緣感應.png',{type:'image/png'});
+if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:'佛緣感應'});
+else alert('請點擊「下載」或長按圖片儲存後分享');
+}catch(e){}
+};
 </script>
 </body>
 </html>
