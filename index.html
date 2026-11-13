@@ -9,8 +9,7 @@
 body,.box{width:100vw;height:100dvh;overflow:hidden;background:#000;color:#fff;position:relative;display:flex;align-items:center;justify-content:center}
 #video{width:100%;height:100%;object-fit:cover}
 .mirror{transform:scaleX(-1)}
-#frame,#ing{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:10;display:none}
-#ing{z-index:15}
+#ing{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:15;display:none}
 #ing-txt{position:absolute;z-index:18;display:none;font-size:2rem;font-weight:bold;color:#ffd700;text-shadow:0 0 12px #000,0 2px 6px #000;letter-spacing:3px;animation:pulse 1s infinite;pointer-events:none}
 @keyframes pulse{0%,100%{opacity:.5;transform:scale(.96)}50%{opacity:1;transform:scale(1.06)}}
 #sw{position:absolute;top:20px;right:20px;z-index:25;background:rgba(0,0,0,.5);color:#fff;border:1px solid #fff8;padding:8px 16px;border-radius:30px}
@@ -18,17 +17,15 @@ body,.box{width:100vw;height:100dvh;overflow:hidden;background:#000;color:#fff;p
 .red-btn{position:relative;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#ff4d4d,#d91e18 65%,#960000);border:6px solid #b5b5b5;box-shadow:0 6px 18px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:1.25rem;line-height:1.15}
 .finger{position:absolute;right:-12px;bottom:-18px;font-size:2.3rem;transform:rotate(-20deg);animation:tap 1.4s infinite;pointer-events:none}
 @keyframes tap{0%,100%{transform:rotate(-20deg) scale(1)}50%{transform:rotate(-20deg) scale(.88)}}
-#ctrls{position:absolute;bottom:30px;z-index:20;display:none;gap:15px}
 @media(orientation:portrait){
 #start-wrap{bottom:95px}
-#ctrls{bottom:90px}
-#frame,#ing{top:-25px;height:calc(100% - 25px)}
+#ing{top:-25px;height:calc(100% - 25px)}
 }
 .btn{background:linear-gradient(135deg,#f6d365,#fda085);color:#4a2500;border:none;padding:15px 34px;font-size:1.15rem;font-weight:bold;border-radius:50px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .sh{background:linear-gradient(135deg,#84fab0,#8fd3f4);color:#00334e}
 .sub{background:rgba(0,0,0,.6);color:#fff;border:1px solid #fff9;padding:12px 18px;border-radius:30px;cursor:pointer}
 #res{position:absolute;inset:0;z-index:40;background:#111;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-#ret{position:absolute;top:20px;left:20px;background:rgba(255,255,255,.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:1.2rem;cursor:pointer}
+#ret{position:absolute;top:20px;left:20px;background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 16px;border-radius:30px;font-size:.95rem;cursor:pointer}
 #photo{max-width:90%;max-height:66vh;border-radius:12px;border:2px solid #ffd700;margin-bottom:14px}
 #tip{position:absolute;z-index:5;text-align:center;display:none}
 </style>
@@ -37,13 +34,12 @@ body,.box{width:100vw;height:100dvh;overflow:hidden;background:#000;color:#fff;p
 <div class="box" id="box">
 <div id="tip"><p style="margin-bottom:10px">📷 需要相機權限</p><button class="sub" id="retry">開啟相機</button></div>
 <video id="video" autoplay playsinline muted></video>
-<img id="ing" onerror="this.style.display='none'"><img id="frame">
+<img id="ing" onerror="if(this.src.endsWith('.jpg'))this.src=this.src.replace('.jpg','.JPG');else this.style.display='none'">
 <div id="ing-txt">🙏 佛緣感應中...</div>
 <button id="sw">🔄 翻轉</button>
 <div id="start-wrap"><div class="red-btn"><span>開始</span><span>感應</span></div><div class="finger">👆</div></div>
-<div id="ctrls"><button id="cap" class="btn">📸 拍照</button><button id="rst" class="sub">重新感應</button></div>
 <div id="res">
-<button id="ret" title="返回重拍">✕</button>
+<button id="ret">🔄 重新感應</button>
 <img id="photo">
 <p style="font-size:.9rem;color:#ccc;margin-bottom:16px">💡 點擊分享可傳送至 FB、IG、LINE 等社群</p>
 <div style="display:flex;gap:18px">
@@ -55,52 +51,81 @@ body,.box{width:100vw;height:100dvh;overflow:hidden;background:#000;color:#fff;p
 <canvas id="cv" style="display:none"></canvas>
 <script>
 const F=[{v:'pic1_L.gif',h:'pic1.gif'},{v:'pic2_L.gif',h:'pic2.gif'},{v:'pic3_L.gif',h:'pic3.gif'},{v:'pic4_L.gif',h:'pic4.gif'},{v:'pic5_L.gif',h:'pic5.gif'}];
-let idx=0,st=null,front=true,ok=false,mode='idle',url='';
-const $=id=>document.getElementById(id),v=$('video'),ing=$('ing'),txt=$('ing-txt'),fr=$('frame');
-new Image().src='ing.gif';new Image().src='ing_L.gif';
+let st=null,front=true,ok=false,url='';
+const $=id=>document.getElementById(id),v=$('video'),ing=$('ing'),txt=$('ing-txt');
+
+new Image().src='ing.jpg';new Image().src='ing_L.jpg';
 window.onload=cam;$('retry').onclick=cam;
 $('sw').onclick=async()=>{front=!front;await cam()};
-$('rst').onclick=()=>{mode='idle';ing.style.display=txt.style.display=fr.style.display=$('ctrls').style.display='none';$('start-wrap').style.display='block'};
-$('ret').onclick=()=>$('res').style.display='none';
+$('ret').onclick=()=>{
+  $('res').style.display='none';
+  $('start-wrap').style.display='block';
+  $('sw').style.display='block';
+};
+
+function setIngSrc(){
+  const L=window.innerWidth>window.innerHeight;
+  ing.src=L?'ing.jpg':'ing_L.jpg';
+}
+window.onresize=setIngSrc;
+
 $('start-wrap').onclick=()=>{
-if(!ok)cam();mode='ing';$('start-wrap').style.display='none';upd();ing.style.display='block';txt.style.display='block';
-idx=Math.floor(Math.random()*5);
-setTimeout(()=>{mode='res';ing.style.display='none';txt.style.display='none';upd();fr.style.display='block';$('ctrls').style.display='flex'},3500);
+  if(!ok)cam();
+  $('start-wrap').style.display='none';
+  $('sw').style.display='none';
+  setIngSrc();
+  ing.style.display='block';
+  txt.style.display='block';
+
+  const idx=Math.floor(Math.random()*5);
+  const L=window.innerWidth>window.innerHeight;
+  const frameImg=new Image();
+  frameImg.src=L?F[idx].h:F[idx].v;
+
+  setTimeout(()=>{
+    ing.style.display='none';
+    txt.style.display='none';
+    captureAndShow(frameImg);
+  },3500);
 };
-function upd(){
-const L=window.innerWidth>window.innerHeight;
-if(mode=='ing')ing.src=L?'ing.gif':'ing_L.gif';
-if(mode=='res')fr.src=L?F[idx].h:F[idx].v;
-}
-window.onresize=upd;
+
 async function cam(){
-ok=false;if(!navigator.mediaDevices)return $('tip').style.display='block';
-if(st)st.getTracks().forEach(t=>t.stop());
-try{
-st=await navigator.mediaDevices.getUserMedia({video:{facingMode:front?'user':'environment'}});
-v.srcObject=st;await v.play();ok=true;$('tip').style.display='none';v.classList.toggle('mirror',front);
-}catch(e){$('tip').style.display='block'}
+  ok=false;if(!navigator.mediaDevices)return $('tip').style.display='block';
+  if(st)st.getTracks().forEach(t=>t.stop());
+  try{
+    st=await navigator.mediaDevices.getUserMedia({video:{facingMode:front?'user':'environment'}});
+    v.srcObject=st;await v.play();ok=true;$('tip').style.display='none';v.classList.toggle('mirror',front);
+  }catch(e){$('tip').style.display='block'}
 }
-$('cap').onclick=()=>{
-const cv=$('cv'),c=cv.getContext('2d'),w=$('box').clientWidth,h=$('box').clientHeight;
-cv.width=w;cv.height=h;
-if(ok&&v.videoWidth){
-const vr=v.videoWidth/v.videoHeight,sr=w/h;
-let dw=vr>sr?h*vr:w,dh=vr>sr?h:w/vr,sx=(w-dw)/2,sy=(h-dh)/2;
-c.save();if(front){c.translate(w,0);c.scale(-1,1)}c.drawImage(v,sx,sy,dw,dh);c.restore();
+
+function captureAndShow(frameImg){
+  const cv=$('cv'),c=cv.getContext('2d'),w=$('box').clientWidth,h=$('box').clientHeight;
+  cv.width=w;cv.height=h;
+  if(ok&&v.videoWidth){
+    const vr=v.videoWidth/v.videoHeight,sr=w/h;
+    let dw=vr>sr?h*vr:w,dh=vr>sr?h:w/vr,sx=(w-dw)/2,sy=(h-dh)/2;
+    c.save();if(front){c.translate(w,0);c.scale(-1,1)}c.drawImage(v,sx,sy,dw,dh);c.restore();
+  }else{
+    c.fillStyle='#222';c.fillRect(0,0,w,h);
+  }
+  const isP=window.innerHeight>window.innerWidth;
+  if(frameImg.complete&&frameImg.naturalWidth>0){
+    c.drawImage(frameImg,0,isP?-25:0,w,isP?h-25:h);
+  }
+  url=cv.toDataURL('image/jpeg',0.92);
+  $('photo').src=$('dl').href=url;
+  $('res').style.display='flex';
 }
-c.drawImage(fr,0,window.innerHeight>window.innerWidth?-25:0,w,window.innerHeight>window.innerWidth?h-25:h);
-url=cv.toDataURL('image/jpeg',0.92);$('photo').src=$('dl').href=url;$('res').style.display='flex';
-};
+
 $('sh').onclick=async()=>{
-try{
-const b=await(await fetch(url)).blob(),f=new File([b],'佛緣感應.jpg',{type:'image/jpeg'});
-if(navigator.canShare&&navigator.canShare({files:[f]})){
-await navigator.share({files:[f],title:'佛緣感應拍照打卡',text:'我的新春佛緣感應結果！'});
-}else{
-alert('目前瀏覽器不支援直接分享圖片，請先點「⬇️ 下載」儲存照片，再開啟 FB 或 IG 上傳喔！');
-}
-}catch(e){}
+  try{
+    const b=await(await fetch(url)).blob(),f=new File([b],'佛緣感應.jpg',{type:'image/jpeg'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){
+      await navigator.share({files:[f],title:'佛緣感應拍照打卡',text:'我的新春佛緣感應結果！'});
+    }else{
+      alert('目前瀏覽器不支援直接分享圖片，請先點「⬇️ 下載」儲存照片，再開啟 FB 或 IG 上傳喔！');
+    }
+  }catch(e){}
 };
 </script>
 </body>
