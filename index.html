@@ -1,481 +1,321 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>玉井感恩精舍 佛緣祈福打卡機</title>
-
-<style>
-
-body{
-    margin:0;
-    padding:20px;
-    text-align:center;
-    background:#f7f2dd;
-    font-family:"Microsoft JhengHei",sans-serif;
-}
-
-h1{
-    color:#9c7300;
-    margin-bottom:10px;
-}
-
-h3{
-    color:#666;
-    font-weight:normal;
-}
-
-video,
-canvas{
-    width:95%;
-    max-width:600px;
-    border:4px solid #d4af37;
-    border-radius:15px;
-}
-
-button{
-    margin:10px;
-    padding:15px 35px;
-    font-size:22px;
-    border:none;
-    border-radius:12px;
-    background:#ffd700;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#f5c400;
-}
-
-#loading{
-    display:none;
-    font-size:24px;
-    color:#9c7300;
-    font-weight:bold;
-    margin:20px;
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>感恩精舍 - 佛緣感應拍照打卡</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+        }
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        /* 主畫面容器 */
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: 100%;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+        /* 初始歡迎畫面 */
+        #start-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 30;
+            background: radial-gradient(circle, #3a2312 0%, #140b05 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        #start-screen img {
+            max-width: 80%;
+            max-height: 55vh;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(255, 200, 100, 0.3);
+            margin-bottom: 30px;
+            object-fit: contain;
+        }
+        /* 按鈕樣式 */
+        .btn {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #4a2500;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4);
+            transition: transform 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        /* 感應中過場畫面 */
+        #loading-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 25;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .pulse-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+            letter-spacing: 3px;
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        /* 相機與圖框預覽區 */
+        #camera-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* 前鏡頭鏡像翻轉 */
+        .mirror {
+            transform: scaleX(-1);
+        }
+        #frame-overlay {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            pointer-events: none;
+            z-index: 10;
+        }
+        /* 底部控制列 */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            z-index: 20;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .sub-btn {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(5px);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        /* 拍照結果畫面 */
+        #result-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 35;
+            background: #111;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #captured-photo {
+            max-width: 90%;
+            max-height: 70vh;
+            border-radius: 12px;
+            border: 2px solid #ffd700;
+            margin-bottom: 20px;
+        }
+        .tip-text {
+            font-size: 0.95rem;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
-
 <body>
 
-<h1>🙏 佛緣祈福 🙏</h1>
-<h3>台南玉井感恩精舍</h3>
+<div class="container">
+    <!-- 1. 初始畫面 -->
+    <div id="start-screen">
+        <!-- 首頁封面圖支援 cover.gif 或 cover.png (若無此圖會自動隱藏) -->
+        <img id="cover-img" src="cover.gif" alt="佛緣感應封面" onerror="if(this.src.endsWith('.gif')){this.src='cover.png'}else{this.style.display='none'}">
+        <h2 style="color: #ffd700; margin-bottom: 25px;">✨ 測測您的新春佛緣指數 ✨</h2>
+        <button class="btn" onclick="startSensing()">開始感應</button>
+    </div>
 
-<video
-id="video"
-autoplay
-playsinline
-muted>
-</video>
+    <!-- 2. 佛緣感應中 (3.5秒) -->
+    <div id="loading-screen">
+        <div class="pulse-text">🙏 佛緣感應中...</div>
+    </div>
 
-<br>
+    <!-- 3. 相機與圖框畫面 -->
+    <div id="camera-container">
+        <video id="video" autoplay playsinline></video>
+        <img id="frame-overlay" src="" alt="佛緣圖框">
+        
+        <div class="controls">
+            <button class="sub-btn" onclick="switchCamera()">🔄 翻轉鏡頭</button>
+            <button class="btn" onclick="takePhoto()">📸 拍照留念</button>
+            <button class="sub-btn" onclick="resetAll()">重新感應</button>
+        </div>
+    </div>
 
-<button id="photoBtn">
-開始祈福拍攝
-</button>
-
-<div id="loading">
-🙏 正在感應佛緣中...
+    <!-- 4. 拍照結果與下載畫面 -->
+    <div id="result-screen">
+        <img id="captured-photo" src="" alt="拍照結果">
+        <p class="tip-text">💡 手機請「長按圖片」儲存，或點擊下方按鈕下載</p>
+        <div style="display: flex; gap: 15px;">
+            <a id="download-link" class="btn" download="佛緣感應打卡.png" style="text-decoration: none;">⬇️ 下載照片</a>
+            <button class="sub-btn" onclick="retakePhoto()">重拍一張</button>
+        </div>
+    </div>
 </div>
 
-<br>
-
-<canvas id="canvas"></canvas>
-
-<br>
-
-<a id="downloadLink" style="display:none;">
-    <button>
-        下載祈福照
-    </button>
-</a>
-
-<button
-id="shareBtn"
-style="display:none;">
-分享祈福照
-</button>
+<!-- 用於合成照片的隱藏畫布 -->
+<canvas id="canvas" style="display: none;"></canvas>
 
 <script>
+    // ==========================================
+    // 圖片設定區：已全數修改為 .gif 格式
+    // ==========================================
+    const frames = [
+        { vertical: 'pic1_L.gif', horizontal: 'pic1.gif' }, // 第1組
+        { vertical: 'pic2_L.gif', horizontal: 'pic2.gif' }, // 第2組
+        { vertical: 'pic3_L.gif', horizontal: 'pic3.gif' }, // 第3組
+        { vertical: 'pic4_L.gif', horizontal: 'pic4.gif' }, // 第4組
+        { vertical: 'pic5_L.gif', horizontal: 'pic5.gif' }  // 第5組
+    ];
 
-const video =
-document.getElementById("video");
+    let selectedFrameIndex = 0;
+    let currentStream = null;
+    let useFrontCamera = true; // 預設開啟前鏡頭自拍
 
-const canvas =
-document.getElementById("canvas");
+    const video = document.getElementById('video');
+    const frameOverlay = document.getElementById('frame-overlay');
+    const startScreen = document.getElementById('start-screen');
+    const loadingScreen = document.getElementById('loading-screen');
+    const cameraContainer = document.getElementById('camera-container');
+    const resultScreen = document.getElementById('result-screen');
 
-const ctx =
-canvas.getContext("2d");
+    // 點擊「開始感應」
+    async function startSensing() {
+        await initCamera();
 
-navigator.mediaDevices
-.getUserMedia({
-    video:true
-})
-.then(function(stream){
+        startScreen.style.display = 'none';
+        loadingScreen.style.display = 'flex';
 
-    video.srcObject = stream;
+        // 隨機抽出 0 ~ 4 的其中一種結果
+        selectedFrameIndex = Math.floor(Math.random() * frames.length);
 
-})
-.catch(function(error){
-
-    alert(
-      "相機啟動失敗："+
-      error.message
-    );
-
-});
-
-document
-.getElementById("photoBtn")
-.addEventListener(
-"click",
-capturePhoto
-);
-
-function capturePhoto(){
-
-    if(video.videoWidth===0){
-
-        alert("請等待相機啟動完成");
-
-        return;
+        // 等待 3.5 秒 (3500 毫秒)
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            cameraContainer.style.display = 'flex';
+            updateFrameOrientation();
+        }, 3500);
     }
 
-    document
-    .getElementById("loading")
-    .style.display="block";
-
-    setTimeout(function(){
-
-        document
-        .getElementById("loading")
-        .style.display="none";
-
-        canvas.width =
-        video.videoWidth;
-
-        canvas.height =
-        video.videoHeight;
-
-        ctx.drawImage(
-            video,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-        // ===== 柔光佛光 =====
-
-const glow =
-ctx.createRadialGradient(
-    canvas.width/2,
-    canvas.height*0.6,
-    50,
-    canvas.width/2,
-    canvas.height*0.6,
-    canvas.width
-);
-
-glow.addColorStop(
-    0,
-    "rgba(255,245,200,0.35)"
-);
-
-glow.addColorStop(
-    0.5,
-    "rgba(255,215,0,0.12)"
-);
-
-glow.addColorStop(
-    1,
-    "rgba(255,215,0,0)"
-);
-
-ctx.fillStyle = glow;
-
-ctx.fillRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-);
-        for(let i=0;i<150;i++){
-
-    const x =
-    Math.random()*canvas.width;
-
-    const y =
-    Math.random()*canvas.height;
-
-    const size =
-    Math.random()*3+1;
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y,
-        size,
-        0,
-        Math.PI*2
-    );
-
-    ctx.fillStyle =
-    "rgba(255,240,200,0.35)";
-
-    ctx.fill();
-}
-
-        const cards=[
-
-            ["88","善念常存"],
-            ["92","福德增長"],
-            ["95","廣結善緣"],
-            ["98","吉祥圓滿"],
-            ["100","佛光普照"]
-
-        ];
-
-        const result =
-        cards[
-            Math.floor(
-                Math.random()*cards.length
-            )
-        ];
-const isLandscape =
-canvas.width > canvas.height;
-
-let infoX;
-let scoreY;
-let titleY;
-let textY;
-let templeY;
-let dateY;
-
-if(isLandscape){
-
-    infoX = canvas.width * 0.84;
-
-    scoreY = 180;
-    titleY = 230;
-    textY = 290;
-    templeY = 350;
-    dateY = 400;
-
-}else{
-
-    infoX = canvas.width / 2;
-
-    scoreY = canvas.height - 260;
-    titleY = canvas.height - 210;
-    textY = canvas.height - 160;
-    templeY = canvas.height - 110;
-    dateY = canvas.height - 60;
-
-}
-        ctx.textAlign="center";
-        ctx.shadowColor =
-"rgba(255,215,0,0.8)";
-
-ctx.shadowBlur = 20;
-
-ctx.strokeStyle="#c89b00";
-
-        ctx.fillStyle="gold";
-        ctx.font="bold 48px sans-serif";
-
-        ctx.strokeText(
-    "🙏 佛緣指數 " + result[0],
-    infoX,
-    scoreY
-);
-
-ctx.fillText(
-    "🙏 佛緣指數 " + result[0],
-    infoX,
-    scoreY
-);
-
-        ctx.fillStyle="white";
-        ctx.font="bold 34px sans-serif";
-
-        ctx.strokeText(
-    result[1],
-    infoX,
-    textY
-);
-
-ctx.fillText(
-    result[1],
-    infoX,
-    textY
-);
-
-        ctx.font="28px sans-serif";
-
-        ctx.strokeText(
-    "感恩精舍祝您新春愉快",
-    infoX,
-    templeY
-);
-
-ctx.fillText(
-    "感恩精舍祝您新春愉快",
-    infoX,
-    templeY
-);
-
-        const today =
-        new Date().toLocaleDateString();
-
-        ctx.font="22px sans-serif";
-
-        ctx.strokeText(
-    today,
-    infoX,
-    dateY
-);
-
-ctx.fillText(
-    today,
-    infoX,
-    dateY
-);
-
-        // ===== Logo =====
-
-        const logo = new Image();
-
-        logo.onload = function(){
-
-            ctx.save();
-
-ctx.globalAlpha = 0.75;
-
-ctx.filter =
-"sepia(100%) saturate(800%) hue-rotate(-50deg)";
-
-ctx.drawImage(
-    logo,
-    20,
-    canvas.height-95,
-    70,
-    70
-);
-
-ctx.restore();
-
-            finishImage();
-
-        };
-
-        logo.onerror = function(){
-
-            finishImage();
-
-        };
-
-        logo.src="logo.png";
-
-        function finishImage(){
-
-            // 金色外框
-
-            ctx.strokeStyle="gold";
-
-            ctx.lineWidth=14;
-
-            ctx.strokeRect(
-                0,
-                0,
-                canvas.width,
-                canvas.height
-            );
-
-            const link =
-            document.getElementById(
-                "downloadLink"
-            );
-
-            link.href =
-            canvas.toDataURL(
-                "image/png"
-            );
-
-            link.download =
-            "感恩精舍祈福照.png";
-
-            link.style.display =
-            "inline-block";
-
-            document
-            .getElementById(
-                "shareBtn"
-            )
-            .style.display=
-            "inline-block";
+    // 啟動相機
+    async function initCamera() {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
         }
+        const constraints = {
+            video: {
+                facingMode: useFrontCamera ? 'user' : 'environment',
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            },
+            audio: false
+        };
 
-    },3500);
-
-}
-
-document
-.getElementById("shareBtn")
-.addEventListener(
-"click",
-sharePhoto
-);
-
-async function sharePhoto(){
-
-    try{
-
-        const response =
-        await fetch(
-            canvas.toDataURL("image/png")
-        );
-
-        const blob =
-        await response.blob();
-
-        const file =
-        new File(
-            [blob],
-            "感恩精舍祈福照.png",
-            {
-                type:"image/png"
+        try {
+            currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = currentStream;
+            if (useFrontCamera) {
+                video.classList.add('mirror');
+            } else {
+                video.classList.remove('mirror');
             }
-        );
-
-        if(navigator.share){
-
-            await navigator.share({
-                title:"感恩精舍祈福照",
-                text:"我在玉井感恩精舍完成佛緣打卡",
-                files:[file]
-            });
-
-        }else{
-
-            alert("此裝置不支援分享功能");
-
+        } catch (err) {
+            alert('無法開啟相機，請確認瀏覽器已允許相機權限，並使用 HTTPS 網址開啟。');
+            console.error(err);
         }
-
-    }catch(e){
-
-        console.log(e);
-
     }
 
-}
+    // 切換前後鏡頭
+    async function switchCamera() {
+        useFrontCamera = !useFrontCamera;
+        await initCamera();
+    }
 
-</script>
+    // 根據手機直拿或橫拿，自動切換直式(_L.gif)或橫式(.gif)圖框
+    function updateFrameOrientation() {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const chosenSet = frames[selectedFrameIndex];
+        frameOverlay.src = isLandscape ? chosenSet.horizontal : chosenSet.vertical;
+    }
 
-</body>
-</html>
+    // 監聽螢幕旋轉事件
+    window.addEventListener('resize', () => {
+        if (cameraContainer.style.display === 'flex') {
+            updateFrameOrientation();
+        }
+    });
+
+    // 拍照並合成圖框
+    function takePhoto() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 設定畫布解析度與目前螢幕比例一致
+        const width = cameraContainer.clientWidth;
+        const height = cameraContainer.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        // 計算 video 滿版裁切比例
+        const videoRatio = video.videoWidth / video.videoHeight;
+        const screenRatio = width / height;
+        let drawWidth, drawHeight, startX, startY;
+
+        if (videoRatio > screenRatio) {
+            drawHeight = height;
+            drawWidth = height * videoRatio;
+            startX = (width - drawWidth) / 2;
+            startY = 0;
+        } else {
