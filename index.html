@@ -1,313 +1,141 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>感恩精舍 - 佛緣感應拍照打卡</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background-color: #000;
-            color: #fff;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-        }
-        /* 主畫面容器（永遠顯示相機） */
-        .container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #1a1a1a;
-            overflow: hidden;
-        }
-        /* 即時自拍鏡頭 */
-        #video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .mirror {
-            transform: scaleX(-1);
-        }
-        /* 佛緣圖框覆蓋層（感應完成後才顯示） */
-        #frame-overlay {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-            pointer-events: none;
-            z-index: 10;
-            display: none;
-        }
-        /* 右上角翻轉鏡頭小按鈕（初始與拍照時皆可使用） */
-        #top-switch-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 25;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: blur(5px);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 8px 16px;
-            font-size: 0.95rem;
-            border-radius: 30px;
-            cursor: pointer;
-        }
-        /* 右下角紅色「開始感應」圓形按鈕（還原您的設計圖） */
-        #start-btn-wrapper {
-            position: absolute;
-            right: 28px;
-            bottom: 35px;
-            z-index: 20;
-            cursor: pointer;
-            user-select: none;
-            transition: transform 0.15s;
-        }
-        #start-btn-wrapper:active {
-            transform: scale(0.92);
-        }
-        .red-circle-btn {
-            position: relative;
-            width: 96px;
-            height: 96px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 50% 30%, #ff4d4d 0%, #d91e18 65%, #960000 100%);
-            border: 6px solid #b5b5b5;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 2px 6px rgba(255, 255, 255, 0.6);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-weight: 900;
-            font-size: 1.25rem;
-            line-height: 1.15;
-            letter-spacing: 1px;
-        }
-        /* 按鈕上半部白色反光高光 */
-        .red-circle-btn::before {
-            content: "";
-            position: absolute;
-            top: 4px;
-            left: 16%;
-            width: 68%;
-            height: 36%;
-            border-radius: 50%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(255,255,255,0.1));
-            pointer-events: none;
-        }
-        /* 點擊提示手指與波紋動畫 */
-        .tap-finger {
-            position: absolute;
-            right: -12px;
-            bottom: -18px;
-            font-size: 2.3rem;
-            transform: rotate(-20deg);
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-            animation: fingerTap 1.4s infinite ease-in-out;
-            pointer-events: none;
-        }
-        @keyframes fingerTap {
-            0%, 100% { transform: rotate(-20deg) scale(1); }
-            50% { transform: rotate(-20deg) scale(0.88) translate(-3px, -3px); }
-        }
-        /* 3.5秒「佛緣感應中...」半透明遮罩（背景仍看得到自己） */
-        #loading-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 30;
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(2px);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .pulse-text {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #ffd700;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
-            letter-spacing: 3px;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; transform: scale(0.96); }
-            50% { opacity: 1; transform: scale(1.06); }
-        }
-        /* 感應完成後的底部拍照控制列 */
-        #photo-controls {
-            position: absolute;
-            bottom: 30px;
-            z-index: 20;
-            display: none;
-            gap: 15px;
-            align-items: center;
-        }
-        .action-btn {
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            color: #4a2500;
-            border: none;
-            padding: 14px 34px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        }
-        .sub-btn {
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(5px);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.6);
-            padding: 12px 20px;
-            font-size: 1rem;
-            border-radius: 30px;
-            cursor: pointer;
-        }
-        /* 拍照結果與下載畫面 */
-        #result-screen {
-            position: absolute;
-            inset: 0;
-            z-index: 40;
-            background: #111;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        #captured-photo {
-            max-width: 90%;
-            max-height: 70vh;
-            border-radius: 12px;
-            border: 2px solid #ffd700;
-            margin-bottom: 18px;
-        }
-        .tip-text {
-            font-size: 0.95rem;
-            color: #ddd;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        /* 若相機未自動開啟時的備用啟動提示 */
-        #camera-permission-tip {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 5;
-            text-align: center;
-            color: #ccc;
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>感恩精舍 - 佛緣感應拍照打卡</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background: #000; color: #fff; overflow: hidden; width: 100vw; height: 100vh; }
+.container { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: #1a1a1a; overflow: hidden; }
+#video { width: 100%; height: 100%; object-fit: cover; }
+.mirror { transform: scaleX(-1); }
+#frame-overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; z-index: 10; display: none; }
+#top-switch-btn { position: absolute; top: 20px; right: 20px; z-index: 25; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.5); padding: 8px 16px; font-size: 0.95rem; border-radius: 30px; cursor: pointer; }
+#start-btn-wrapper { position: absolute; right: 28px; bottom: 35px; z-index: 20; cursor: pointer; user-select: none; }
+#start-btn-wrapper:active { transform: scale(0.92); }
+.red-circle-btn { position: relative; width: 96px; height: 96px; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #ff4d4d 0%, #d91e18 65%, #960000 100%); border: 6px solid #b5b5b5; box-shadow: 0 6px 18px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #000; font-weight: 900; font-size: 1.25rem; line-height: 1.15; }
+.red-circle-btn::before { content: ""; position: absolute; top: 4px; left: 16%; width: 68%; height: 36%; border-radius: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(255,255,255,0.1)); }
+.tap-finger { position: absolute; right: -12px; bottom: -18px; font-size: 2.3rem; transform: rotate(-20deg); animation: fingerTap 1.4s infinite; pointer-events: none; }
+@keyframes fingerTap { 0%, 100% { transform: rotate(-20deg) scale(1); } 50% { transform: rotate(-20deg) scale(0.88); } }
+#loading-overlay { position: absolute; inset: 0; z-index: 30; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; }
+.pulse-text { font-size: 2rem; font-weight: bold; color: #ffd700; text-shadow: 0 2px 10px #000; letter-spacing: 3px; animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.96); } 50% { opacity: 1; transform: scale(1.06); } }
+#photo-controls { position: absolute; bottom: 30px; z-index: 20; display: none; gap: 15px; align-items: center; }
+.action-btn { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #4a2500; border: none; padding: 14px 34px; font-size: 1.2rem; font-weight: bold; border-radius: 50px; cursor: pointer; text-decoration: none; }
+.sub-btn { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.6); padding: 12px 20px; font-size: 1rem; border-radius: 30px; cursor: pointer; }
+#result-screen { position: absolute; inset: 0; z-index: 40; background: #111; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+#captured-photo { max-width: 90%; max-height: 70vh; border-radius: 12px; border: 2px solid #ffd700; margin-bottom: 18px; }
+.tip-text { font-size: 0.95rem; color: #ddd; margin-bottom: 15px; text-align: center; }
+#camera-permission-tip { position: absolute; z-index: 5; text-align: center; color: #ccc; display: none; }
+</style>
 </head>
 <body>
-
 <div class="container" id="camera-container">
-    <!-- 相機權限備用提示 -->
     <div id="camera-permission-tip">
         <p style="margin-bottom: 12px;">📷 需要開啟相機才能自拍打卡</p>
-        <button class="sub-btn" onclick="initCamera()">點此開啟相機</button>
+        <button class="sub-btn" id="btn-retry-cam" type="button">點此開啟相機</button>
     </div>
-
-    <!-- 1. 即時自拍畫面 -->
     <video id="video" autoplay playsinline muted></video>
-
-    <!-- 2. 隨機抽出的佛緣圖框 -->
     <img id="frame-overlay" src="" alt="佛緣圖框">
-
-    <!-- 右上角翻轉鏡頭 -->
     <button id="top-switch-btn" type="button">🔄 翻轉鏡頭</button>
-
-    <!-- 3. 初始狀態：右下角紅色「開始感應」圓形按鈕 -->
-    <div id="start-btn-wrapper" role="button" aria-label="開始感應">
-        <div class="red-circle-btn">
-            <span>開始</span>
-            <span>感應</span>
-        </div>
+    <div id="start-btn-wrapper" role="button">
+        <div class="red-circle-btn"><span>開始</span><span>感應</span></div>
         <div class="tap-finger">👆</div>
     </div>
-
-    <!-- 4. 感應中過場提示 (3.5秒) -->
-    <div id="loading-overlay">
-        <div class="pulse-text">🙏 佛緣感應中...</div>
-    </div>
-
-    <!-- 5. 感應完成後：底部拍照與重新感應列 -->
+    <div id="loading-overlay"><div class="pulse-text">🙏 佛緣感應中...</div></div>
     <div id="photo-controls">
         <button id="btn-capture" class="action-btn" type="button">📸 拍照留念</button>
         <button id="btn-reset" class="sub-btn" type="button">重新感應</button>
     </div>
-
-    <!-- 6. 拍照結果與下載畫面 -->
     <div id="result-screen">
         <img id="captured-photo" src="" alt="拍照結果">
         <p class="tip-text">💡 手機請「長按圖片」儲存，或點擊下方按鈕下載</p>
         <div style="display: flex; gap: 15px;">
-            <a id="download-link" class="action-btn" download="佛緣感應打卡.png" style="text-decoration: none;">⬇️ 下載照片</a>
+            <a id="download-link" class="action-btn" download="佛緣感應打卡.png">⬇️ 下載照片</a>
             <button id="btn-retake" class="sub-btn" type="button">重拍一張</button>
         </div>
     </div>
 </div>
-
 <canvas id="canvas" style="display: none;"></canvas>
-
 <script>
-    const frames = [
-        { vertical: 'pic1_L.gif', horizontal: 'pic1.gif' },
-        { vertical: 'pic2_L.gif', horizontal: 'pic2.gif' },
-        { vertical: 'pic3_L.gif', horizontal: 'pic3.gif' },
-        { vertical: 'pic4_L.gif', horizontal: 'pic4.gif' },
-        { vertical: 'pic5_L.gif', horizontal: 'pic5.gif' }
-    ];
+const frames = [
+    { vertical: 'pic1_L.gif', horizontal: 'pic1.gif' },
+    { vertical: 'pic2_L.gif', horizontal: 'pic2.gif' },
+    { vertical: 'pic3_L.gif', horizontal: 'pic3.gif' },
+    { vertical: 'pic4_L.gif', horizontal: 'pic4.gif' },
+    { vertical: 'pic5_L.gif', horizontal: 'pic5.gif' }
+];
+let selectedFrameIndex = 0, currentStream = null, useFrontCamera = true, cameraReady = false, hasSensed = false;
+const video = document.getElementById('video'), frameOverlay = document.getElementById('frame-overlay'), startBtnWrapper = document.getElementById('start-btn-wrapper'), loadingOverlay = document.getElementById('loading-overlay'), photoControls = document.getElementById('photo-controls'), resultScreen = document.getElementById('result-screen'), cameraContainer = document.getElementById('camera-container'), permissionTip = document.getElementById('camera-permission-tip');
 
-    let selectedFrameIndex = 0;
-    let currentStream = null;
-    let useFrontCamera = true;
-    let cameraReady = false;
-    let hasSensed = false;
+window.addEventListener('DOMContentLoaded', initCamera);
+document.getElementById('btn-retry-cam').addEventListener('click', initCamera);
+startBtnWrapper.addEventListener('click', startSensing);
+document.getElementById('top-switch-btn').addEventListener('click', async () => { useFrontCamera = !useFrontCamera; await initCamera(); });
+document.getElementById('btn-capture').addEventListener('click', takePhoto);
+document.getElementById('btn-reset').addEventListener('click', () => { hasSensed = false; frameOverlay.style.display = 'none'; photoControls.style.display = 'none'; startBtnWrapper.style.display = 'block'; });
+document.getElementById('btn-retake').addEventListener('click', () => { resultScreen.style.display = 'none'; });
 
-    const video = document.getElementById('video');
-    const frameOverlay = document.getElementById('frame-overlay');
-    const startBtnWrapper = document.getElementById('start-btn-wrapper');
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const photoControls = document.getElementById('photo-controls');
-    const resultScreen = document.getElementById('result-screen');
-    const cameraContainer = document.getElementById('camera-container');
-    const permissionTip = document.getElementById('camera-permission-tip');
+async function initCamera() {
+    cameraReady = false;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { permissionTip.style.display = 'block'; return; }
+    if (currentStream) { currentStream.getTracks().forEach(t => t.stop()); }
+    try {
+        currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: useFrontCamera ? 'user' : 'environment' }, audio: false });
+        video.srcObject = currentStream;
+        await video.play();
+        cameraReady = true;
+        permissionTip.style.display = 'none';
+        video.classList.toggle('mirror', useFrontCamera);
+    } catch (err) {
+        permissionTip.style.display = 'block';
+    }
+}
 
-    // 網頁一載入，立刻啟動前置自拍相機
-    window.addEventListener('DOMContentLoaded', () => {
-        initCamera();
-    });
+function startSensing() {
+    if (!cameraReady) initCamera();
+    startBtnWrapper.style.display = 'none';
+    loadingOverlay.style.display = 'flex';
+    selectedFrameIndex = Math.floor(Math.random() * frames.length);
+    setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+        hasSensed = true;
+        updateFrameOrientation();
+        frameOverlay.style.display = 'block';
+        photoControls.style.display = 'flex';
+    }, 3500);
+}
 
-    // 綁定所有按鈕事件
-    startBtnWrapper.addEventListener('click', startSensing);
-    document.getElementById('top-switch-btn').addEventListener('click', switchCamera);
-    document.getElementById('btn-capture').addEventListener('click', takePhoto);
-    document.getElementById('btn-reset').addEventListener('click', resetSensing);
-    document.getElementById('btn-retake').addEventListener('click', retakePhoto);
+function updateFrameOrientation() {
+    if (!hasSensed) return;
+    const isLandscape = window.innerWidth > window.innerHeight;
+    frameOverlay.src = isLandscape ? frames[selectedFrameIndex].horizontal : frames[selectedFrameIndex].vertical;
+}
+window.addEventListener('resize', updateFrameOrientation);
 
-    // 啟動相機
-    async function initCamera() {
-        cameraReady = false;
-
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            permissionTip.style.display = 'block';
-            return;
-        }
-
+function takePhoto() {
+    const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
+    const w = cameraContainer.clientWidth, h = cameraContainer.clientHeight;
+    canvas.width = w; canvas.height = h;
+    if (cameraReady && video.videoWidth > 0) {
+        const vRatio = video.videoWidth / video.videoHeight, sRatio = w / h;
+        let dw, dh, sx, sy;
+        if (vRatio > sRatio) { dh = h; dw = h * vRatio; sx = (w - dw) / 2; sy = 0; }
+        else { dw = w; dh = w / vRatio; sx = 0; sy = (h - dh) / 2; }
+        ctx.save();
+        if (useFrontCamera) { ctx.translate(w, 0); ctx.scale(-1, 1); }
+        ctx.drawImage(video, sx, sy, dw, dh);
+        ctx.restore();
+    } else {
+        ctx.fillStyle = '#222'; ctx.fillRect(0, 0, w, h);
+    }
+    ctx.drawImage(frameOverlay, 0, 0, w, h);
+    const dataURL = canvas.toDataURL('image/png');
+    document.getElementById('captured-photo').src = dataURL;
+    document.getElementById('download-link').href = dataURL;
+    resultScreen.style.display = 'flex';
+}
+</script>
+</body>
+</html>
