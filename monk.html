@@ -14,9 +14,9 @@ body,.box{width:100vw;height:100dvh;overflow:hidden;background:#1a120b;color:#ff
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;width:100%;max-width:480px}
 .card{background:rgba(255,255,255,.1);border:2px solid rgba(255,215,0,.5);border-radius:16px;padding:10px;text-align:center;cursor:pointer;transition:transform .15s;display:flex;flex-direction:column;justify-content:space-between}
 .card:active{transform:scale(.95);border-color:#ffd700}
-.card img{width:100%;height:125px;object-fit:contain;background:rgba(255,255,255,.85);border-radius:10px;margin-bottom:8px;padding:4px}
+.card img{width:100%;height:135px;object-fit:contain;background:rgba(255,255,255,.85);border-radius:10px;margin-bottom:8px;padding:4px}
 .card span{font-weight:bold;color:#ffe699;font-size:1rem}
-.card.coming{opacity:.45;border-style:dashed;cursor:default;justify-content:center;min-height:175px}
+.card.coming{opacity:.45;border-style:dashed;cursor:default;justify-content:center;min-height:185px}
 .card.coming:active{transform:none}
 
 /* 2. 相機對位畫面 */
@@ -57,7 +57,7 @@ body,.box{width:100vw;height:100dvh;overflow:hidden;background:#1a120b;color:#ff
     <button class="pill-btn" id="back-sel">⬅️ 重選模板</button>
     <button class="pill-btn" id="sw">🔄 翻轉鏡頭</button>
   </div>
-  <div id="rotate-tip">📱 請將手機橫拿，拍出最佳合照效果！</div>
+  <div id="rotate-tip"></div>
   <div id="cam-ctrls">
     <div class="hint-tag">請將臉部對準空白處</div>
     <button class="btn" id="cap">📸 拍照</button>
@@ -76,11 +76,14 @@ body,.box{width:100vw;height:100dvh;overflow:hidden;background:#1a120b;color:#ff
 </div>
 <canvas id="cv" style="display:none"></canvas>
 <script>
+// ==========================================
+// 模板清單設定區：h 為橫式檔名，v 為直式檔名
+// ==========================================
 const TEMPLATES=[
   {name:'可愛小沙彌合照',h:'monk1.png',v:'monk1_L.png',ready:true},
-  {name:'更多模板準備中...',ready:false},
-  {name:'更多模板準備中...',ready:false},
-  {name:'更多模板準備中...',ready:false}
+  {name:'與師父歡喜合照',h:'monk2.png',v:'monk2_L.png',ready:true},
+  {name:'歡喜疊羅漢',h:'',v:'monk3_L.png',ready:true},
+  {name:'更多造型準備中...',ready:false}
 ];
 
 let selIdx=0,st=null,front=true,ok=false,url='';
@@ -90,7 +93,8 @@ TEMPLATES.forEach((t,i)=>{
   const div=document.createElement('div');
   if(t.ready){
     div.className='card';
-    div.innerHTML=`<img src="${t.h}"><span>${t.name}</span>`;
+    const previewSrc=t.h||t.v;
+    div.innerHTML=`<img src="${previewSrc}"><span>${t.name}</span>`;
     div.onclick=()=>startTemplate(i);
   }else{
     div.className='card coming';
@@ -112,13 +116,33 @@ async function startTemplate(i){
 function updOverlay(){
   const L=window.innerWidth>window.innerHeight;
   const t=TEMPLATES[selIdx];
+  rtip.style.display='none';
+  ov.onerror=null;
+
   if(L){
-    rtip.style.display='none';
-    ov.src=t.h;
+    if(t.h){
+      ov.src=t.h;
+    }else{
+      ov.src=t.v;
+      rtip.textContent='📱 此模板為直式設計，請將手機直拿拍照！';
+      rtip.style.display='block';
+    }
   }else{
-    ov.onerror=()=>{ov.onerror=null;ov.src=t.h;rtip.style.display='block'};
-    rtip.style.display='none';
-    ov.src=t.v;
+    if(t.v){
+      ov.onerror=()=>{
+        ov.onerror=null;
+        if(t.h){
+          ov.src=t.h;
+          rtip.textContent='📱 此模板為橫式設計，請將手機橫拿拍照！';
+          rtip.style.display='block';
+        }
+      };
+      ov.src=t.v;
+    }else if(t.h){
+      ov.src=t.h;
+      rtip.textContent='📱 此模板為橫式設計，請將手機橫拿拍照！';
+      rtip.style.display='block';
+    }
   }
 }
 window.onresize=updOverlay;
