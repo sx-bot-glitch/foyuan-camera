@@ -79,13 +79,26 @@ $('start-wrap').onclick=()=>{
 
   const idx=Math.floor(Math.random()*5);
   const L=window.innerWidth>window.innerHeight;
-  const frameImg=new Image();
-  frameImg.src=L?F[idx].h:F[idx].v;
+  const targetSrc=L?F[idx].h:F[idx].v;
+
+  // 先預載入快取，確保 3.5 秒後瞬間讀取不延遲
+  const preload=new Image();
+  preload.src=targetSrc;
 
   setTimeout(()=>{
-    ing.style.display='none';
-    txt.style.display='none';
-    captureAndShow(frameImg);
+    // 時間到時建立全新 Image 並加上時間戳記，強制從 GIF 第 1 格開始抓取（確保數字完整顯示）
+    const freshFrame=new Image();
+    freshFrame.onload=()=>{
+      ing.style.display='none';
+      txt.style.display='none';
+      captureAndShow(freshFrame);
+    };
+    freshFrame.onerror=()=>{
+      ing.style.display='none';
+      txt.style.display='none';
+      captureAndShow(preload);
+    };
+    freshFrame.src=targetSrc+'?t='+Date.now();
   },3500);
 };
 
