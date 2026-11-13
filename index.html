@@ -12,7 +12,7 @@ body,.box{width:100vw;height:100dvh;overflow:hidden;background:#000;color:#fff;p
 #ing{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:15;display:none}
 #ing-txt{position:absolute;z-index:18;display:none;font-size:2rem;font-weight:bold;color:#ffd700;text-shadow:0 0 12px #000,0 2px 6px #000;letter-spacing:3px;animation:pulse 1s infinite;pointer-events:none}
 @keyframes pulse{0%,100%{opacity:.5;transform:scale(.96)}50%{opacity:1;transform:scale(1.06)}}
-#sw{position:absolute;top:20px;right:20px;z-index:25;background:rgba(0,0,0,.5);color:#fff;border:1px solid #fff8;padding:8px 16px;border-radius:30px}
+#sw{position:absolute;top:20px;right:20px;z-index:25;background:rgba(0,0,0,.5);color:#fff;border:1px solid #fff8;padding:8px 16px;border-radius:30px;cursor:pointer}
 #start-wrap{position:absolute;right:28px;bottom:35px;z-index:20;cursor:pointer}
 .red-btn{position:relative;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#ff4d4d,#d91e18 65%,#960000);border:6px solid #b5b5b5;box-shadow:0 6px 18px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:1.25rem;line-height:1.15}
 .finger{position:absolute;right:-12px;bottom:-18px;font-size:2.3rem;transform:rotate(-20deg);animation:tap 1.4s infinite;pointer-events:none}
@@ -81,12 +81,10 @@ $('start-wrap').onclick=()=>{
   const L=window.innerWidth>window.innerHeight;
   const targetSrc=L?F[idx].h:F[idx].v;
 
-  // 先預載入快取，確保 3.5 秒後瞬間讀取不延遲
   const preload=new Image();
   preload.src=targetSrc;
 
   setTimeout(()=>{
-    // 時間到時建立全新 Image 並加上時間戳記，強制從 GIF 第 1 格開始抓取（確保數字完整顯示）
     const freshFrame=new Image();
     freshFrame.onload=()=>{
       ing.style.display='none';
