@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>趣味拍照打卡 - 選擇模板</title>
+<title>感恩沙彌打卡</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Microsoft JhengHei",sans-serif;-webkit-tap-highlight-color:transparent}
 body,.box{width:100vw;height:100dvh;overflow:hidden;background:#1a120b;color:#fff;position:relative;display:flex;align-items:center;justify-content:center}
@@ -45,7 +45,7 @@ body,.box{width:100vw;height:100dvh;overflow:hidden;background:#1a120b;color:#ff
 <div class="box" id="box">
   <!-- 1. 模板選擇畫面 -->
   <div id="select-screen">
-    <h2>✨ 趣味拍照打卡 ✨</h2>
+    <h2>✨ 感恩沙彌打卡 ✨</h2>
     <p>請點選下方喜歡的拍照模板</p>
     <div class="grid" id="grid"></div>
   </div>
@@ -69,16 +69,13 @@ body,.box{width:100vw;height:100dvh;overflow:hidden;background:#1a120b;color:#ff
     <img id="photo">
     <p style="font-size:.9rem;color:#ccc;margin-bottom:16px">💡 點擊分享可傳送至 FB、IG、LINE 等社群</p>
     <div style="display:flex;gap:18px">
-      <a id="dl" class="btn" download="趣味打卡.jpg">⬇️ 下載</a>
+      <a id="dl" class="btn" download="感恩沙彌打卡.jpg">⬇️ 下載</a>
       <button id="sh" class="btn sh">📤 分享</button>
     </div>
   </div>
 </div>
 <canvas id="cv" style="display:none"></canvas>
 <script>
-// ==========================================
-// 模板清單設定區：未來新增模板只要在此加入一行即可
-// ==========================================
 const TEMPLATES=[
   {name:'可愛小沙彌合照',h:'monk1.png',v:'monk1_L.png',ready:true},
   {name:'更多模板準備中...',ready:false},
@@ -89,7 +86,6 @@ const TEMPLATES=[
 let selIdx=0,st=null,front=true,ok=false,url='';
 const $=id=>document.getElementById(id),v=$('video'),ov=$('monk-overlay'),rtip=$('rotate-tip');
 
-// 建立模板選擇卡片
 TEMPLATES.forEach((t,i)=>{
   const div=document.createElement('div');
   if(t.ready){
@@ -120,7 +116,6 @@ function updOverlay(){
     rtip.style.display='none';
     ov.src=t.h;
   }else{
-    // 若直式圖(_L.png)尚未上傳，自動改用橫式圖並提示橫拿手機
     ov.onerror=()=>{ov.onerror=null;ov.src=t.h;rtip.style.display='block'};
     rtip.style.display='none';
     ov.src=t.v;
@@ -167,9 +162,9 @@ $('cap').onclick=()=>{
 
 $('sh').onclick=async()=>{
   try{
-    const b=await(await fetch(url)).blob(),f=new File([b],'趣味打卡.jpg',{type:'image/jpeg'});
+    const b=await(await fetch(url)).blob(),f=new File([b],'感恩沙彌打卡.jpg',{type:'image/jpeg'});
     if(navigator.canShare&&navigator.canShare({files:[f]})){
-      await navigator.share({files:[f],title:'趣味拍照打卡',text:'快來看看我的拍照打卡！'});
+      await navigator.share({files:[f],title:'感恩沙彌打卡',text:'快來看看我的感恩沙彌打卡照！'});
     }else{
       alert('目前瀏覽器不支援直接分享圖片，請先點「⬇️ 下載」儲存照片，再開啟 FB 或 IG 上傳喔！');
     }
