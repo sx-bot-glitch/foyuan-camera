@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>趣味拍照打卡 - 選擇模板</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Microsoft JhengHei",sans-serif;-webkit-tap-highlight-color:transparent}
+body,.box{width:100vw;height:100dvh;overflow:hidden;background:#1a120b;color:#fff;position:relative;display:flex;align-items:center;justify-content:center}
+/* 1. 模板選擇大廳 */
+#select-screen{position:absolute;inset:0;z-index:30;background:radial-gradient(circle,#3d2817 0%,#140c06 100%);display:flex;flex-direction:column;align-items:center;padding:28px 20px;overflow-y:auto}
+#select-screen h2{color:#ffd700;margin-bottom:6px;font-size:1.55rem;text-align:center}
+#select-screen p{color:#ddd;margin-bottom:22px;font-size:.95rem}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;width:100%;max-width:480px}
+.card{background:rgba(255,255,255,.1);border:2px solid rgba(255,215,0,.5);border-radius:16px;padding:10px;text-align:center;cursor:pointer;transition:transform .15s;display:flex;flex-direction:column;justify-content:space-between}
+.card:active{transform:scale(.95);border-color:#ffd700}
+.card img{width:100%;height:125px;object-fit:contain;background:rgba(255,255,255,.85);border-radius:10px;margin-bottom:8px;padding:4px}
+.card span{font-weight:bold;color:#ffe699;font-size:1rem}
+.card.coming{opacity:.45;border-style:dashed;cursor:default;justify-content:center;min-height:175px}
+.card.coming:active{transform:none}
+
+/* 2. 相機對位畫面 */
+#video{width:100%;height:100%;object-fit:cover}
+.mirror{transform:scaleX(-1)}
+#monk-overlay{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:10;display:none}
+#top-bar{position:absolute;top:20px;left:20px;right:20px;z-index:25;display:none;justify-content:space-between}
+.pill-btn{background:rgba(0,0,0,.55);color:#fff;border:1px solid #fff8;padding:8px 16px;border-radius:30px;font-size:.95rem;cursor:pointer}
+#rotate-tip{position:absolute;top:75px;z-index:22;background:rgba(217,30,24,.88);color:#fff;padding:8px 18px;border-radius:25px;font-size:.9rem;font-weight:bold;display:none;box-shadow:0 4px 12px #0006}
+#cam-ctrls{position:absolute;bottom:30px;z-index:20;display:none;flex-direction:column;align-items:center;gap:10px}
+.hint-tag{background:rgba(0,0,0,.6);color:#ffd700;padding:6px 16px;border-radius:20px;font-size:.9rem}
+@media(orientation:portrait){
+#cam-ctrls{bottom:90px}
+#monk-overlay{top:-25px;height:calc(100% - 25px)}
+}
+.btn{background:linear-gradient(135deg,#f6d365,#fda085);color:#4a2500;border:none;padding:15px 36px;font-size:1.15rem;font-weight:bold;border-radius:50px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 15px #0008}
+.sh{background:linear-gradient(135deg,#84fab0,#8fd3f4);color:#00334e}
+
+/* 3. 拍照結果畫面 */
+#res{position:absolute;inset:0;z-index:40;background:#111;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#ret{position:absolute;top:20px;left:20px;background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 16px;border-radius:30px;font-size:.95rem;cursor:pointer}
+#photo{max-width:90%;max-height:66vh;border-radius:12px;border:2px solid #ffd700;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="box" id="box">
+  <!-- 1. 模板選擇畫面 -->
+  <div id="select-screen">
+    <h2>✨ 趣味拍照打卡 ✨</h2>
+    <p>請點選下方喜歡的拍照模板</p>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- 2. 相機對位畫面 -->
+  <video id="video" autoplay playsinline muted></video>
+  <img id="monk-overlay">
+  <div id="top-bar">
+    <button class="pill-btn" id="back-sel">⬅️ 重選模板</button>
+    <button class="pill-btn" id="sw">🔄 翻轉鏡頭</button>
+  </div>
+  <div id="rotate-tip">📱 請將手機橫拿，拍出最佳合照效果！</div>
+  <div id="cam-ctrls">
+    <div class="hint-tag">請將臉部對準空白處</div>
+    <button class="btn" id="cap">📸 拍照</button>
+  </div>
+
+  <!-- 3. 成品下載與分享 -->
+  <div id="res">
+    <button id="ret">🔄 重新拍照</button>
+    <img id="photo">
+    <p style="font-size:.9rem;color:#ccc;margin-bottom:16px">💡 點擊分享可傳送至 FB、IG、LINE 等社群</p>
+    <div style="display:flex;gap:18px">
+      <a id="dl" class="btn" download="趣味打卡.jpg">⬇️ 下載</a>
+      <button id="sh" class="btn sh">📤 分享</button>
+    </div>
+  </div>
+</div>
+<canvas id="cv" style="display:none"></canvas>
+<script>
+// ==========================================
+// 模板清單設定區：未來新增模板只要在此加入一行即可
+// ==========================================
+const TEMPLATES=[
+  {name:'可愛小沙彌合照',h:'monk1.png',v:'monk1_L.png',ready:true},
+  {name:'更多模板準備中...',ready:false},
+  {name:'更多模板準備中...',ready:false},
+  {name:'更多模板準備中...',ready:false}
+];
+
+let selIdx=0,st=null,front=true,ok=false,url='';
+const $=id=>document.getElementById(id),v=$('video'),ov=$('monk-overlay'),rtip=$('rotate-tip');
+
+// 建立模板選擇卡片
+TEMPLATES.forEach((t,i)=>{
+  const div=document.createElement('div');
+  if(t.ready){
+    div.className='card';
+    div.innerHTML=`<img src="${t.h}"><span>${t.name}</span>`;
+    div.onclick=()=>startTemplate(i);
+  }else{
+    div.className='card coming';
+    div.innerHTML=`<span>🎨<br>${t.name}</span>`;
+  }
+  $('grid').appendChild(div);
+});
+
+async function startTemplate(i){
+  selIdx=i;
+  $('select-screen').style.display='none';
+  $('top-bar').style.display='flex';
+  $('cam-ctrls').style.display='flex';
+  ov.style.display='block';
+  updOverlay();
+  if(!ok)await cam();
+}
+
+function updOverlay(){
+  const L=window.innerWidth>window.innerHeight;
+  const t=TEMPLATES[selIdx];
+  if(L){
+    rtip.style.display='none';
+    ov.src=t.h;
+  }else{
+    // 若直式圖(_L.png)尚未上傳，自動改用橫式圖並提示橫拿手機
+    ov.onerror=()=>{ov.onerror=null;ov.src=t.h;rtip.style.display='block'};
+    rtip.style.display='none';
+    ov.src=t.v;
+  }
+}
+window.onresize=updOverlay;
+
+$('back-sel').onclick=()=>{
+  ov.style.display='none';
+  rtip.style.display='none';
+  $('top-bar').style.display='none';
+  $('cam-ctrls').style.display='none';
+  $('select-screen').style.display='flex';
+};
+
+$('sw').onclick=async()=>{front=!front;await cam()};
+$('ret').onclick=()=>$('res').style.display='none';
+
+async function cam(){
+  ok=false;if(!navigator.mediaDevices)return alert('請使用 Safari 或 Chrome 開啟網址以使用相機');
+  if(st)st.getTracks().forEach(t=>t.stop());
+  try{
+    st=await navigator.mediaDevices.getUserMedia({video:{facingMode:front?'user':'environment'}});
+    v.srcObject=st;await v.play();ok=true;v.classList.toggle('mirror',front);
+  }catch(e){alert('無法開啟相機，請確認已允許相機權限')}
+}
+
+$('cap').onclick=()=>{
+  const cv=$('cv'),c=cv.getContext('2d'),w=$('box').clientWidth,h=$('box').clientHeight;
+  cv.width=w;cv.height=h;
+  if(ok&&v.videoWidth){
+    const vr=v.videoWidth/v.videoHeight,sr=w/h;
+    let dw=vr>sr?h*vr:w,dh=vr>sr?h:w/vr,sx=(w-dw)/2,sy=(h-dh)/2;
+    c.save();if(front){c.translate(w,0);c.scale(-1,1)}c.drawImage(v,sx,sy,dw,dh);c.restore();
+  }else{
+    c.fillStyle='#222';c.fillRect(0,0,w,h);
+  }
+  const isP=window.innerHeight>window.innerWidth;
+  c.drawImage(ov,0,isP?-25:0,w,isP?h-25:h);
+  url=cv.toDataURL('image/jpeg',0.92);
+  $('photo').src=$('dl').href=url;
+  $('res').style.display='flex';
+};
+
+$('sh').onclick=async()=>{
+  try{
+    const b=await(await fetch(url)).blob(),f=new File([b],'趣味打卡.jpg',{type:'image/jpeg'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){
+      await navigator.share({files:[f],title:'趣味拍照打卡',text:'快來看看我的拍照打卡！'});
+    }else{
+      alert('目前瀏覽器不支援直接分享圖片，請先點「⬇️ 下載」儲存照片，再開啟 FB 或 IG 上傳喔！');
+    }
+  }catch(e){}
+};
+</script>
+</body>
+</html>
